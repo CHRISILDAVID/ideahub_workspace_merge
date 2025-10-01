@@ -14,6 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Existing workspace model - DO NOT MODIFY
 model File {
   id         String   @id @default(cuid())
   fileName   String
@@ -22,4 +23,195 @@ model File {
   archived   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  
+  // Relation to Idea - one workspace per idea
+  idea       Idea?    @relation("IdeaWorkspace")
+}
+
+// User model for authentication and profile
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  username        String    @unique
+  fullName        String
+  avatarUrl       String?
+  bio             String?
+  location        String?
+  website         String?
+  passwordHash    String    // For authentication
+  joinedAt        DateTime  @default(now())
+  followers       Int       @default(0)
+  following       Int       @default(0)
+  publicRepos     Int       @default(0)
+  isVerified      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  ideas           Idea[]           @relation("AuthoredIdeas")
+  comments        Comment[]
+  likes           Like[]
+  followers_rel   Follow[]         @relation("Following")
+  following_rel   Follow[]         @relation("Followers")
+  notifications   Notification[]
+  collaborations  Collaborator[]
+  
+  @@index([email])
+  @@index([username])
+}
+
+// Idea model - represents a user's idea with associated workspace
+model Idea {
+  id              String         @id @default(cuid())
+  title           String
+  description     String
+  content         String         @db.Text
+  authorId        String
+  tags            String[]
+  category        String
+  license         String         @default("MIT")
+  version         String         @default("1.0.0")
+  stars           Int            @default(0)
+  forks           Int            @default(0)
+  isFork          Boolean        @default(false)
+  forkedFromId    String?
+  visibility      Visibility     @default(PUBLIC)
+  language        String?
+  status          IdeaStatus     @default(PUBLISHED)
+  workspaceId     String?        @unique // One-to-one with File (workspace)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  // Relations
+  author          User           @relation("AuthoredIdeas", fields: [authorId], references: [id], onDelete: Cascade)
+  forkedFrom      Idea?          @relation("IdeaForks", fields: [forkedFromId], references: [id], onDelete: SetNull)
+  forks_rel       Idea[]         @relation("IdeaForks")
+  workspace       File?          @relation("IdeaWorkspace", fields: [workspaceId], references: [id], onDelete: SetNull)
+  comments        Comment[]
+  likes           Like[]
+  collaborators   Collaborator[]
+  notifications   Notification[]
+  
+  @@index([authorId])
+  @@index([category])
+  @@index([visibility, status])
+  @@index([createdAt])
+  @@index([stars])
+}
+
+// Collaborator model - max 3 collaborators per idea
+model Collaborator {
+  id        String   @id @default(cuid())
+  ideaId    String
+  userId    String
+  role      CollaboratorRole @default(COLLABORATOR)
+  invitedAt DateTime @default(now())
+  
+  // Relations
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([ideaId, userId])
+  @@index([ideaId])
+  @@index([userId])
+}
+
+// Comment model for idea discussions
+model Comment {
+  id        String    @id @default(cuid())
+  content   String    @db.Text
+  authorId  String
+  ideaId    String
+  parentId  String?
+  votes     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  // Relations
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  idea      Idea      @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  
+  @@index([ideaId])
+  @@index([authorId])
+  @@index([parentId])
+}
+
+// Like model (stars in original schema)
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  ideaId    String
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idea      Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, ideaId])
+  @@index([userId])
+  @@index([ideaId])
+}
+
+// Follow model for user relationships
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  follower    User     @relation("Followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// Notification model
+model Notification {
+  id              String           @id @default(cuid())
+  userId          String
+  type            NotificationType
+  message         String
+  isRead          Boolean          @default(false)
+  relatedUserId   String?
+  relatedIdeaId   String?
+  relatedUrl      String?
+  createdAt       DateTime         @default(now())
+  
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  relatedIdea     Idea?            @relation(fields: [relatedIdeaId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Enums
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum IdeaStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CollaboratorRole {
+  OWNER
+  COLLABORATOR
+}
+
+enum NotificationType {
+  STAR
+  FORK
+  COMMENT
+  MENTION
+  FOLLOW
+  COLLABORATION_INVITE
 }

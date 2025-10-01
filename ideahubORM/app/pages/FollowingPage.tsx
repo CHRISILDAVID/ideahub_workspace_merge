@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Layout } from '../components/Layout/Layout';
 import { Users, Loader2, MapPin, ExternalLink } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -95,7 +95,7 @@ export const FollowingPage: React.FC = () => {
               Discover and follow interesting creators to see their latest ideas.
             </p>
             <Link
-              to="/explore"
+              href="/explore"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
             >
               Explore Ideas

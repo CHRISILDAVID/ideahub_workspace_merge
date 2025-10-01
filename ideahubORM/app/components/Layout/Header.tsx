@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Search, Bell, Plus, User, Settings, LogOut, Moon, Sun, Menu, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -7,7 +8,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 export const Header: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,13 +16,13 @@ export const Header: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    router.push('/');
     setIsProfileOpen(false);
   };
 
@@ -31,7 +32,7 @@ export const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo and Brand */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">IH</span>
               </div>
@@ -69,7 +70,7 @@ export const Header: React.FC = () => {
               <>
                 {/* Create Button */}
                 <Link
-                  to="/create"
+                  href="/create"
                   className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   <Plus className="w-4 h-4" />
@@ -78,7 +79,7 @@ export const Header: React.FC = () => {
 
                 {/* Notifications */}
                 <Link
-                  to="/notifications"
+                  href="/notifications"
                   className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Bell className="w-5 h-5" />
@@ -120,7 +121,7 @@ export const Header: React.FC = () => {
                         <span>Profile</span>
                       </Link>
                       <Link
-                        to="/settings"
+                        href="/settings"
                         className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setIsProfileOpen(false)}
                       >
@@ -142,13 +143,13 @@ export const Header: React.FC = () => {
             ) : (
               <>
                 <Link
-                  to="/login"
+                  href="/login"
                   className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
+                  href="/register"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Sign Up
@@ -187,7 +188,7 @@ export const Header: React.FC = () => {
               {isAuthenticated && (
                 <>
                   <Link
-                    to="/create"
+                    href="/create"
                     className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -195,7 +196,7 @@ export const Header: React.FC = () => {
                     <span>Create Idea</span>
                   </Link>
                   <Link
-                    to="/notifications"
+                    href="/notifications"
                     className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >

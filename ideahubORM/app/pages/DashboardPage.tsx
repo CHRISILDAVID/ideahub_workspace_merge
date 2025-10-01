@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Layout } from '../components/Layout/Layout';
 import { IdeaCard } from '../components/Ideas/IdeaCard';
 import { 
@@ -99,7 +99,7 @@ export const DashboardPage: React.FC = () => {
               Please sign in to view your dashboard
             </h1>
             <Link
-              to="/login"
+              href="/login"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
               Sign In
@@ -133,13 +133,13 @@ export const DashboardPage: React.FC = () => {
 
           <div className="flex items-center space-x-3">
             <Link
-              to="/settings"
+              href="/settings"
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <Settings className="w-5 h-5" />
             </Link>
             <Link
-              to="/create"
+              href="/create"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -255,7 +255,7 @@ export const DashboardPage: React.FC = () => {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Link
-                      to="/create"
+                      href="/create"
                       className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <div className="flex items-center space-x-3">
@@ -270,7 +270,7 @@ export const DashboardPage: React.FC = () => {
                     </Link>
 
                     <Link
-                      to="/explore"
+                      href="/explore"
                       className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <div className="flex items-center space-x-3">
@@ -285,7 +285,7 @@ export const DashboardPage: React.FC = () => {
                     </Link>
 
                     <Link
-                      to="/profile"
+                      href="/profile"
                       className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <div className="flex items-center space-x-3">
@@ -308,7 +308,7 @@ export const DashboardPage: React.FC = () => {
                       Recent Ideas
                     </h3>
                     <Link
-                      to="#"
+                      href="#"
                       onClick={() => setActiveTab('ideas')}
                       className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                     >
@@ -331,7 +331,7 @@ export const DashboardPage: React.FC = () => {
                     Your Ideas ({userIdeas.length})
                   </h3>
                   <Link
-                    to="/create"
+                    href="/create"
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -351,7 +351,7 @@ export const DashboardPage: React.FC = () => {
                       Start sharing your innovative ideas with the community.
                     </p>
                     <Link
-                      to="/create"
+                      href="/create"
                       className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-flex items-center"
                     >
                       <Plus className="w-4 h-4 mr-2" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Layout } from '../components/Layout/Layout';
 import { Bell, Loader2, Star, GitFork, MessageCircle, Users, Check } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';

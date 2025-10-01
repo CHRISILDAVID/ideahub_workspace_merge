@@ -1,6 +1,6 @@
 'use client';
 
-import CreatePage from '@/app/pages/CreatePage';
+import { CreatePage } from '@/app/pages/CreatePage';
 
 /**
  * /ideas/new route

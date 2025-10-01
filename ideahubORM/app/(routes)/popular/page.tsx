@@ -1,7 +1,7 @@
 'use client';
 
-import TrendingPage from '@/app/pages/TrendingPage';
+import { PopularPage } from '@/app/pages/TrendingPage';
 
 export default function PopularRoute() {
-  return <TrendingPage />;
+  return <PopularPage />;
 }

@@ -1,5 +1,6 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 
 interface AuthPersistenceProps {
   children: React.ReactNode;
@@ -17,16 +18,8 @@ export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) =>
       try {
         console.log('AuthPersistence: Initializing auth state from cookies...');
         
-        // This will automatically read from cookies and set up the session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('AuthPersistence: Error getting session:', error);
-        } else if (session) {
-          console.log('AuthPersistence: Session restored from cookies for user:', session.user?.id);
-        } else {
-          console.log('AuthPersistence: No session found in cookies');
-        }
+        // Auth is now handled by AuthContext
+        console.log('AuthPersistence: Auth initialization delegated to AuthContext');
       } catch (error) {
         console.error('AuthPersistence: Error initializing auth persistence:', error);
       } finally {

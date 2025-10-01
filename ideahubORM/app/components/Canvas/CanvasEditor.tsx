@@ -116,7 +116,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     }
   }, [objects, onObjectsChange, saveToHistory]);
 
-  const checkDeselect = useCallback((e: KonvaEventObject<MouseEvent>) => {
+  const checkDeselect = useCallback((e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
       setSelectedId(null);

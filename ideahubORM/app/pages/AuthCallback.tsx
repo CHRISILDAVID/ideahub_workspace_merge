@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import { authCookieManager } from '../utils/authCookieManager';
 import { Loader2 } from 'lucide-react';
 
 export const AuthCallback: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -15,7 +15,7 @@ export const AuthCallback: React.FC = () => {
         
         if (error) {
           console.error('Auth callback error:', error);
-          navigate('/login?error=confirmation_failed');
+          router.push('/login?error=confirmation_failed');
           return;
         }
 
@@ -24,21 +24,21 @@ export const AuthCallback: React.FC = () => {
           await authCookieManager.initializeFromCookies();
           
           // User is confirmed and logged in
-          navigate('/?confirmed=true');
+          router.push('/?confirmed=true');
         } else {
           // No session, check if we can restore from cookies
           const authData = await authCookieManager.handlePageReload();
           
           if (authData?.session) {
-            navigate('/?confirmed=true');
+            router.push('/?confirmed=true');
           } else {
             // No valid session found, redirect to login
-            navigate('/login');
+            router.push('/login');
           }
         }
       } catch (error) {
         console.error('Unexpected error during auth callback:', error);
-        navigate('/login?error=unexpected');
+        router.push('/login?error=unexpected');
       }
     };
 

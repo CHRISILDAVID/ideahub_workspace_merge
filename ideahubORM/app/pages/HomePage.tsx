@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Layout } from '../components/Layout/Layout';
 import { IdeaCard } from '../components/Ideas/IdeaCard';
 import { 
@@ -230,14 +230,14 @@ export const HomePage: React.FC = () => {
               {isAuthenticated ? (
                 <>
                   <Link
-                    to="/create"
+                    href="/create"
                     className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center"
                   >
                     <Rocket className="w-5 h-5 mr-2" />
                     Share Your Idea
                   </Link>
                   <Link
-                    to="/explore"
+                    href="/explore"
                     className="border-2 border-blue-200 text-blue-100 px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors inline-flex items-center justify-center"
                   >
                     <Globe className="w-5 h-5 mr-2" />
@@ -247,14 +247,14 @@ export const HomePage: React.FC = () => {
               ) : (
                 <>
                   <Link
-                    to="/register"
+                    href="/register"
                     className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center justify-center"
                   >
                     Get Started Free
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
                   <Link
-                    to="/explore"
+                    href="/explore"
                     className="border-2 border-blue-200 text-blue-100 px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors inline-flex items-center justify-center"
                   >
                     Explore Ideas
@@ -323,7 +323,7 @@ export const HomePage: React.FC = () => {
                   Popular Ideas
                 </h2>
                 <Link
-                  to="/popular"
+                  href="/popular"
                   className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center"
                 >
                   View all
@@ -414,7 +414,7 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
                 <Link
-                  to="/create"
+                  href="/create"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                 >
                   <Rocket className="w-4 h-4 mr-2" />
@@ -431,13 +431,13 @@ export const HomePage: React.FC = () => {
                 </p>
                 <div className="space-y-2">
                   <Link
-                    to="/register"
+                    href="/register"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                   >
                     Get Started Free
                   </Link>
                   <Link
-                    to="/login"
+                    href="/login"
                     className="w-full text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                   >
                     Sign In

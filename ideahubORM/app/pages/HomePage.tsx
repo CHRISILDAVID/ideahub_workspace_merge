@@ -474,7 +474,7 @@ export const HomePage: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-900 dark:text-white">
                           <Link
-                            to={`/profile/${activity.user.username}`}
+                            href={`/profile/${activity.user.username}`}
                             className="font-medium hover:text-blue-600 dark:hover:text-blue-400"
                           >
                             {activity.user.username}
@@ -483,7 +483,7 @@ export const HomePage: React.FC = () => {
                           {activity.description}
                           {activity.idea && (
                             <Link
-                              to={`/ideas/${activity.idea.id}`}
+                              href={`/ideas/${activity.idea.id}`}
                               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                             >
                               {' '}{activity.idea.title}

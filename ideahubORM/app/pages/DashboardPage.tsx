@@ -27,7 +27,7 @@ export const DashboardPage: React.FC = () => {
     totalStars: 0,
     totalForks: 0,
     totalViews: 0,
-    recentActivity: [],
+    recentActivity: [] as any[],
   });
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -402,7 +402,7 @@ export const DashboardPage: React.FC = () => {
                             {activity.description}
                             {activity.idea && (
                               <Link
-                                to={`/ideas/${activity.idea.id}`}
+                                href={`/ideas/${activity.idea.id}`}
                                 className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                               >
                                 {' '}{activity.idea.title}

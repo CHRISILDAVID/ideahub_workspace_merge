@@ -12,12 +12,7 @@ export const CreatePage: React.FC = () => {
     const handleRedirect = async () => {
       if (!isAuthenticated) {
         // Redirect to login if not authenticated
-        router.push('/login', { 
-          state: { 
-            from: '/create',
-            message: 'Please sign in to create a new idea' 
-          } 
-        });
+        router.push('/login?from=/create&message=' + encodeURIComponent('Please sign in to create a new idea'));
         return;
       }
 
@@ -37,7 +32,7 @@ export const CreatePage: React.FC = () => {
     };
 
     handleRedirect();
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">

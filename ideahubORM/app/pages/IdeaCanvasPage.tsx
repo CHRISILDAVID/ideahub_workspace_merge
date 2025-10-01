@@ -65,7 +65,6 @@ type ViewMode = 'document' | 'both' | 'canvas';
 export const IdeaCanvasPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   
   const [idea, setIdea] = useState<Idea | null>(null);
@@ -317,7 +316,7 @@ export const IdeaCanvasPage: React.FC = () => {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => router.push(-1)}
+              onClick={() => router.back()}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

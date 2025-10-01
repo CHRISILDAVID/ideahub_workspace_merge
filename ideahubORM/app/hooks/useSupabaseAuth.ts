@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { User as SupabaseUser } from '@supabase/supabase-js';
+
+// Use a generic type since we're not using actual Supabase
+type SupabaseUser = any;
 
 export interface AuthState {
   user: SupabaseUser | null;
@@ -22,8 +24,9 @@ export const useSupabaseAuth = () => {
           console.error('Error getting session:', error);
         }
         
+        const sessionData = session as any;
         setAuthState({
-          user: session?.user ?? null,
+          user: sessionData?.user ?? null,
           isLoading: false,
         });
       } catch (error) {

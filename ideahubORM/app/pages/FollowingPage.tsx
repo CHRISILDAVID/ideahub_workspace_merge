@@ -120,7 +120,7 @@ export const FollowingPage: React.FC = () => {
                     />
                     <div className="flex-1 min-w-0">
                       <Link
-                        to={`/profile/${followingUser.username}`}
+                        href={`/profile/${followingUser.username}`}
                         className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate block"
                       >
                         {followingUser.fullName}

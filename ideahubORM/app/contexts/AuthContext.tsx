@@ -46,8 +46,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           console.error('AuthContext: Error getting session:', sessionError);
         }
 
-        if (mounted && session?.user) {
-          console.log('AuthContext: Found existing session for user:', session.user.id);
+        // Type assertion since our stub returns null
+        const sessionData = session as any;
+        if (mounted && sessionData?.user) {
+          console.log('AuthContext: Found existing session for user:', sessionData.user.id);
           try {
             const currentUser = await supabaseApi.getCurrentUser();
             if (mounted) {

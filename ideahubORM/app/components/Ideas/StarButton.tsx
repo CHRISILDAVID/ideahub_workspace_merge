@@ -33,8 +33,11 @@ export const StarButton: React.FC<StarButtonProps> = ({
       }
 
       // Update local state based on the response
-      setIsStarred(data.is_starred);
-      setStarCount(prev => data.is_starred ? prev + 1 : prev - 1);
+      if (data && typeof data === 'object' && 'is_starred' in data) {
+        const starData = data as { is_starred: boolean };
+        setIsStarred(starData.is_starred);
+        setStarCount(prev => starData.is_starred ? prev + 1 : prev - 1);
+      }
     } catch (error) {
       console.error('Failed to toggle star:', error);
     } finally {

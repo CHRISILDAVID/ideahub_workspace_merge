@@ -113,7 +113,7 @@ export const Header: React.FC = () => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                       <Link
-                        to={`/profile/${user?.username}`}
+                        href={`/profile/${user?.username}`}
                         className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setIsProfileOpen(false)}
                       >

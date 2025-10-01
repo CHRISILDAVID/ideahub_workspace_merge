@@ -186,7 +186,7 @@ export const NotificationsPage: React.FC = () => {
                         
                         {notification.relatedIdea && (
                           <Link
-                            to={`/ideas/${notification.relatedIdea.id}`}
+                            href={`/ideas/${notification.relatedIdea.id}`}
                             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                           >
                             View Idea
@@ -195,7 +195,7 @@ export const NotificationsPage: React.FC = () => {
                         
                         {notification.relatedUser && !notification.relatedIdea && (
                           <Link
-                            to={`/profile/${notification.relatedUser.username}`}
+                            href={`/profile/${notification.relatedUser.username}`}
                             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                           >
                             View Profile

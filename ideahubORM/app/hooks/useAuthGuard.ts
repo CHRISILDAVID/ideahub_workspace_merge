@@ -10,12 +10,12 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
   const { redirectTo = '/login', requireAuth = true } = options;
   const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
-  const location = useLocation();
+  const pathname = usePathname();
 
   const requireAuthentication = () => {
     if (!isLoading && !isAuthenticated && requireAuth) {
-      const currentPath = pathname + location.search;
-      router.push(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`, { replace: true });
+      const currentPath = pathname;
+      router.replace(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
       return false;
     }
     return isAuthenticated || !requireAuth;

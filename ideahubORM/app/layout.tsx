@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
+import "./idea-hub.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
-
-const inter = Inter({ subsets: ["latin"] });
+import { ThemeProvider } from "@/app/contexts/ThemeContext";
+import { AuthProvider } from "@/app/contexts/AuthContext";
 
 export const metadata: Metadata = {
-  title: "Ideahub_workspace",
-  description: "Minimal Prisma-backed workspace",
+  title: "IdeaHub - Share and Collaborate on Ideas",
+  description: "A platform for sharing, collaborating, and bringing ideas to life",
 };
 
 export default function RootLayout({
@@ -18,8 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, "bg-neutral-900 text-white")}> 
-        {children}
+      <body className="bg-neutral-900 text-white"> 
+        <ThemeProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

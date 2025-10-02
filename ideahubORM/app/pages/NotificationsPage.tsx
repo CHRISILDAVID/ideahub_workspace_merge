@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Layout } from '../components/Layout/Layout';
+import Link from 'next/link';
+import { Layout } from '@/app/components/Layout/Layout';
 import { Bell, Loader2, Star, GitFork, MessageCircle, Users, Check } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
-import { Notification } from '../types';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { api } from '@/app/services/api';
+import { Notification } from '@/app/types';
 
 export const NotificationsPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();

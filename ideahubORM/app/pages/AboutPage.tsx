@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout } from '../components/Layout/Layout';
+import { Layout } from '@/app/components/Layout/Layout';
 
 export const AboutPage: React.FC = () => {
   return (

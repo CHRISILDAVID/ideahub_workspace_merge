@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'next/link';
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export const RegisterForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -17,12 +17,12 @@ export const RegisterForm: React.FC = () => {
   const [error, setError] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const { register, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Check for confirmation success
   React.useEffect(() => {
     if (searchParams.get('confirmed') === 'true') {
-      navigate('/?welcome=true');
+      router.push('/?welcome=true');
     }
   }, [searchParams, navigate]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

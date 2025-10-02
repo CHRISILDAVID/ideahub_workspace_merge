@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IdeaCard } from './IdeaCard';
-import { Idea, SearchFilters } from '../../types';
-import { api } from '../../services/api';
+import { Idea, SearchFilters } from '@/app/types';
+import { api } from '@/app/services/api';
 import { Loader2 } from 'lucide-react';
 
 interface IdeaListProps {

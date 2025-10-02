@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'next/link';
 import { 
   Home, 
   Compass, 
@@ -10,7 +10,7 @@ import {
   Settings,
   User
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const { user, isAuthenticated } = useAuth();

@@ -1,7 +1,7 @@
-import { supabase, handleSupabaseError } from '../../lib/supabase';
-import { User, ApiResponse } from '../../types';
-import { transformDbUser, DbUser } from './transformers';
-import { castToColumn, castToInsert, castToUpdate, castFromSupabase } from './utils';
+import { supabase, handleSupabaseError } from '@/lib/supabase';
+import { User, ApiResponse } from '@/app/types';
+import { transformDbUser, DbUser } from '@/app/services/api/transformers';
+import { castToColumn, castToInsert, castToUpdate, castFromSupabase } from '@/app/services/api/utils';
 
 export class UsersService {
   /**

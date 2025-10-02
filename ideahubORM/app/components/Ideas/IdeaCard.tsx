@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { MessageCircle, Clock, Eye, GitFork } from 'lucide-react';
-import { Idea } from '../../types';
+import { Idea } from '@/app/types';
 import { useAuthGuard } from '../../hooks/useAuthGuard';
 import { StarButton } from './StarButton';
 import { ForkButton } from './ForkButton';

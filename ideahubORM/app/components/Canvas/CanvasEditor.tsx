@@ -14,7 +14,7 @@ import {
   ZoomIn,
   ZoomOut
 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { CanvasTool } from './CanvasToolbar';
 import { CanvasTopBar } from './CanvasTopBar';
 import { PropertiesPanel } from './PropertiesPanel';

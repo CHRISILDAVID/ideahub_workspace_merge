@@ -17,7 +17,7 @@ export {
   type DbUser,
   type DbIdea,
   type DbComment,
-} from './transformers';
+} from '@/app/services/api/transformers';
 
 // Re-export utilities
 export {
@@ -25,7 +25,7 @@ export {
   castToInsert,
   castToUpdate,
   castFromSupabase,
-} from './utils';
+} from '@/app/services/api/utils';
 
 // Main API object for backward compatibility
 export const supabaseApi = {

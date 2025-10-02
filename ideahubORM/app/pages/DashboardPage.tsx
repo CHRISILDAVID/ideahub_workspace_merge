@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Layout } from '../components/Layout/Layout';
-import { IdeaCard } from '../components/Ideas/IdeaCard';
+import Link from 'next/link';
+import { Layout } from '@/app/components/Layout/Layout';
+import { IdeaCard } from '@/app/components/Ideas/IdeaCard';
 import { 
   Plus, 
   Star, 
@@ -14,9 +14,9 @@ import {
   BarChart3,
   Settings
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
-import { Idea, Activity as ActivityType } from '../types';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { api } from '@/app/services/api';
+import { Idea, Activity as ActivityType } from '@/app/types';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();

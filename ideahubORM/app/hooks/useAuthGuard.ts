@@ -1,4 +1,4 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface UseAuthGuardOptions {

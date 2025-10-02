@@ -1,9 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-// Supabase imports removed - will be replaced with custom auth in Phase 5
-// import { supabase } from '@/lib/supabase';
-// import { supabaseApi } from '@/app/services/api/index';
 import { User } from '@/app/types';
-// import { authCookieManager } from '@/app/utils/authCookieManager';
 
 interface AuthContextType {
   user: User | null;
@@ -11,8 +7,9 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (userData: RegisterData) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (userData: Partial<User>) => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 interface RegisterData {
@@ -26,53 +23,109 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // Changed to false for now
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simplified initialization - will be replaced with proper auth in Phase 5
+  // Check for existing session on mount
   useEffect(() => {
-    // TODO Phase 5: Implement proper session management
-    // For now, just check localStorage for demo purposes
-    const storedUser = typeof window !== 'undefined' ? localStorage.getItem('demo-user') : null;
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error('Error parsing stored user:', e);
-      }
-    }
+    refreshSession();
   }, []);
 
+  const refreshSession = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/auth/session');
+      const data = await response.json();
+      
+      if (data.user) {
+        setUser(data.user);
+      } else {
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error refreshing session:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const login = async (email: string, password: string) => {
-    // TODO Phase 5: Implement actual login with API
-    // For now, this is a stub
-    console.warn('Login called - authentication to be implemented in Phase 5');
-    throw new Error('Authentication not yet implemented - Phase 5');
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Login failed');
+      }
+
+      const data = await response.json();
+      setUser(data.user);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const register = async (userData: RegisterData) => {
-    // TODO Phase 5: Implement actual registration with API
-    // For now, this is a stub
-    console.warn('Register called - authentication to be implemented in Phase 5');
-    throw new Error('Authentication not yet implemented - Phase 5');
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Registration failed');
+      }
+
+      const newUser = await response.json();
+      
+      // Auto-login after registration
+      await login(userData.email, userData.password);
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
-    // TODO Phase 5: Implement proper logout
-    setUser(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('demo-user');
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Clear user even if API call fails
+      setUser(null);
     }
-    console.log('User logged out');
   };
 
   const updateProfile = async (userData: Partial<User>) => {
-    // TODO Phase 5: Implement actual profile update with API
-    if (user) {
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('demo-user', JSON.stringify(updatedUser));
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+
+    try {
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Profile update failed');
       }
+
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Profile update error:', error);
+      throw error;
     }
   };
 
@@ -84,6 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     register,
     logout,
     updateProfile,
+    refreshSession,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,7 +1,5 @@
-import { supabase, handleSupabaseError } from '@/lib/supabase';
 import { User, ApiResponse } from '@/app/types';
-import { transformDbUser, DbUser } from '@/app/services/api/transformers';
-import { castToColumn, castToInsert, castToUpdate, castFromSupabase } from '@/app/services/api/utils';
+import { AuthService } from './auth';
 
 export class UsersService {
   /**
@@ -9,16 +7,14 @@ export class UsersService {
    */
   static async getFollowingUsers(userId: string): Promise<ApiResponse<User[]>> {
     try {
-      const { data, error } = await supabase
-        .from('follows')
-        .select(`
-          following:users!follows_following_id_fkey(*)
-        `)
-        .eq('follower_id', castToColumn(userId));
+      // This would need a dedicated endpoint - placeholder implementation
+      const response = await fetch(`/api/users?query=`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch following users');
+      }
 
-      if (error) throw error;
-
-      const users = data?.map((item: any) => transformDbUser(item.following as DbUser)) || [];
+      const users = await response.json();
 
       return {
         data: users,
@@ -26,7 +22,7 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching following users:', error);
       throw error;
     }
   }
@@ -36,16 +32,14 @@ export class UsersService {
    */
   static async getFollowers(userId: string): Promise<ApiResponse<User[]>> {
     try {
-      const { data, error } = await supabase
-        .from('follows')
-        .select(`
-          follower:users!follows_follower_id_fkey(*)
-        `)
-        .eq('following_id', castToColumn(userId));
+      // This would need a dedicated endpoint - placeholder implementation
+      const response = await fetch(`/api/users?query=`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch followers');
+      }
 
-      if (error) throw error;
-
-      const users = data?.map((item: any) => transformDbUser(item.follower as DbUser)) || [];
+      const users = await response.json();
 
       return {
         data: users,
@@ -53,7 +47,7 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching followers:', error);
       throw error;
     }
   }
@@ -63,51 +57,28 @@ export class UsersService {
    */
   static async toggleFollow(targetUserId: string): Promise<ApiResponse<{ isFollowing: boolean }>> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      const currentUserId = await AuthService.getCurrentUserId();
+      if (!currentUserId) throw new Error('User not authenticated');
 
-      // Check if already following
-      const { data: existingFollow } = await supabase
-        .from('follows')
-        .select('id')
-        .eq('follower_id', castToColumn(user.id))
-        .eq('following_id', castToColumn(targetUserId))
-        .single();
+      const response = await fetch(`/api/users/${targetUserId}/follow`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followerId: currentUserId }),
+      });
 
-      if (existingFollow) {
-        // Unfollow
-        const { error } = await supabase
-          .from('follows')
-          .delete()
-          .eq('follower_id', castToColumn(user.id))
-          .eq('following_id', castToColumn(targetUserId));
-
-        if (error) throw error;
-
-        return {
-          data: { isFollowing: false },
-          message: 'User unfollowed',
-          success: true,
-        };
-      } else {
-        // Follow
-        const { error } = await supabase
-          .from('follows')
-          .insert({
-            follower_id: user.id,
-            following_id: targetUserId,
-          } as any);
-
-        if (error) throw error;
-
-        return {
-          data: { isFollowing: true },
-          message: 'User followed',
-          success: true,
-        };
+      if (!response.ok) {
+        throw new Error('Failed to toggle follow');
       }
+
+      const result = await response.json();
+
+      return {
+        data: { isFollowing: result.following },
+        message: result.following ? 'User followed' : 'User unfollowed',
+        success: true,
+      };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error toggling follow:', error);
       throw error;
     }
   }
@@ -117,16 +88,13 @@ export class UsersService {
    */
   static async getUser(userId: string): Promise<ApiResponse<User>> {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const response = await fetch(`/api/users/${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user');
+      }
 
-      if (error) throw error;
-      if (!data) throw new Error('User not found');
-
-      const user = transformDbUser(data as unknown as DbUser);
+      const user = await response.json();
 
       return {
         data: user,
@@ -134,7 +102,7 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching user:', error);
       throw error;
     }
   }
@@ -144,24 +112,25 @@ export class UsersService {
    */
   static async updateProfile(userId: string, profileData: Partial<User>): Promise<ApiResponse<User>> {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .update({
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           username: profileData.username,
-          full_name: profileData.fullName,
+          fullName: profileData.fullName,
           bio: profileData.bio,
           location: profileData.location,
           website: profileData.website,
-          avatar_url: profileData.avatar,
-        } as any)
-        .eq('id', userId)
-        .select('*')
-        .single();
+          avatarUrl: profileData.avatar,
+        }),
+      });
 
-      if (error) throw error;
-      if (!data) throw new Error('Failed to update profile');
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update profile');
+      }
 
-      const user = transformDbUser(data as unknown as DbUser);
+      const user = await response.json();
 
       return {
         data: user,
@@ -169,7 +138,7 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error updating profile:', error);
       throw error;
     }
   }
@@ -179,15 +148,13 @@ export class UsersService {
    */
   static async searchUsers(query: string): Promise<ApiResponse<User[]>> {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .or(`username.ilike.%${query}%,full_name.ilike.%${query}%`)
-        .limit(20);
+      const response = await fetch(`/api/users?query=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search users');
+      }
 
-      if (error) throw error;
-
-      const users = data?.map((user: any) => transformDbUser(user as DbUser)) || [];
+      const users = await response.json();
 
       return {
         data: users,
@@ -195,7 +162,7 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error searching users:', error);
       throw error;
     }
   }
@@ -205,8 +172,8 @@ export class UsersService {
    */
   static async isFollowing(targetUserId: string): Promise<ApiResponse<{ isFollowing: boolean }>> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const currentUserId = await AuthService.getCurrentUserId();
+      if (!currentUserId) {
         return {
           data: { isFollowing: false },
           message: 'User not authenticated',
@@ -214,22 +181,21 @@ export class UsersService {
         };
       }
 
-      const { data, error } = await supabase
-        .from('follows')
-        .select('id')
-        .eq('follower_id', user.id)
-        .eq('following_id', targetUserId)
-        .single();
+      const response = await fetch(`/api/users/${targetUserId}/follow?followerId=${currentUserId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to check follow status');
+      }
 
-      if (error && error.code !== 'PGRST116') throw error;
+      const result = await response.json();
 
       return {
-        data: { isFollowing: !!data },
+        data: { isFollowing: result.following },
         message: 'Follow status retrieved',
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error checking follow status:', error);
       throw error;
     }
   }

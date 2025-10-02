@@ -1,5 +1,5 @@
 // DEPRECATED: This file has been replaced by the structured API modules in ./api/
-// Please use imports from './api/index' instead
+// Please use imports from '@/app/services/api/index' instead
 
 // This file is kept for reference only and should not be used in new code
 // The functionality has been moved to properly structured, modular services:
@@ -12,9 +12,9 @@
 // - StatsService: ./api/stats.ts
 //
 // Import the new structured API like this:
-// import { supabaseApi, AuthService, IdeasService } from './api/index';
+// import { supabaseApi, AuthService, IdeasService } from '@/app/services/api/index';
 
 console.warn('DEPRECATED: supabaseApi.ts has been replaced by structured modules in ./api/. Please update your imports.');
 
 // Re-export the new structured API for backward compatibility
-export { supabaseApi } from './api/index';
+export { supabaseApi } from '@/app/services/api/index';

@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -12,7 +14,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo = '/login' 
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const location = useLocation();
+  const pathname = usePathname();
+  const router = useRouter();
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 
   useEffect(() => {
@@ -23,6 +26,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    // Redirect to login if not authenticated after auth check
+    if (hasCheckedAuth && (!isAuthenticated || !user)) {
+      console.log('ProtectedRoute: User not authenticated, redirecting to login');
+      router.push(`${redirectTo}?redirect=${encodeURIComponent(pathname)}`);
+    }
+  }, [hasCheckedAuth, isAuthenticated, user, redirectTo, pathname, router]);
 
   // Show loading while checking authentication or during initial auth check
   if (isLoading || !hasCheckedAuth) {
@@ -38,14 +49,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Redirect to login if not authenticated, preserving the intended destination
+  // If not authenticated, show loading while redirecting
   if (!isAuthenticated || !user) {
-    console.log('ProtectedRoute: User not authenticated, redirecting to login');
     return (
-      <Navigate 
-        to={`${redirectTo}?redirect=${encodeURIComponent(location.pathname + location.search)}`} 
-        replace 
-      />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Redirecting to login...</p>
+        </div>
+      </div>
     );
   }
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 export const CreatePage: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(true);
 
@@ -12,12 +12,7 @@ export const CreatePage: React.FC = () => {
     const handleRedirect = async () => {
       if (!isAuthenticated) {
         // Redirect to login if not authenticated
-        navigate('/login', { 
-          state: { 
-            from: '/create',
-            message: 'Please sign in to create a new idea' 
-          } 
-        });
+        router.push('/login?from=/create&message=Please sign in to create a new idea');
         return;
       }
 
@@ -25,7 +20,7 @@ export const CreatePage: React.FC = () => {
         // Wait a bit for user data to load
         setTimeout(() => {
           if (!user) {
-            navigate('/login');
+            router.push('/login');
           }
         }, 1000);
         return;
@@ -33,11 +28,11 @@ export const CreatePage: React.FC = () => {
 
       // User is authenticated, redirect to new idea creation
       setIsRedirecting(false);
-      navigate('/ideas/new');
+      router.push('/ideas/new');
     };
 
     handleRedirect();
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, router]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">

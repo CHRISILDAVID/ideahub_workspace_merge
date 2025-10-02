@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Layout } from '../components/Layout/Layout';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
+import { Layout } from '@/app/components/Layout/Layout';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { useTheme } from '@/app/contexts/ThemeContext';
 import { 
   User, 
   Mail, 

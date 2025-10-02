@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/app/lib/supabase';
 
 interface AuthPersistenceProps {
   children: React.ReactNode;

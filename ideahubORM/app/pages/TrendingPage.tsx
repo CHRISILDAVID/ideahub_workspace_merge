@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from '../components/Layout/Layout';
-import { IdeaCard } from '../components/Ideas/IdeaCard';
+import { Layout } from '@/app/components/Layout/Layout';
+import { IdeaCard } from '@/app/components/Ideas/IdeaCard';
 import { TrendingUp, Calendar, Star, GitFork, Eye, Clock } from 'lucide-react';
-import { api } from '../services/api';
-import { Idea } from '../types';
+import { api } from '@/app/services/api';
+import { Idea } from '@/app/types';
 
 export const PopularPage: React.FC = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);

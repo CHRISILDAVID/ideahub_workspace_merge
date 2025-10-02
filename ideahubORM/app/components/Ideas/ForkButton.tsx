@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/app/lib/supabase';
+import { apiClient } from '@/app/lib/api-client';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { Idea } from '@/app/types';
 
 interface ForkButtonProps {
@@ -13,6 +14,7 @@ export const ForkButton: React.FC<ForkButtonProps> = ({
   className = '',
 }) => {
   const router = useRouter();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState(`${idea.title} - variation`);
@@ -20,6 +22,10 @@ export const ForkButton: React.FC<ForkButtonProps> = ({
   const [error, setError] = useState('');
 
   const handleOpenModal = () => {
+    if (!user) {
+      setError('You must be logged in to fork ideas');
+      return;
+    }
     setIsModalOpen(true);
   };
 
@@ -31,6 +37,11 @@ export const ForkButton: React.FC<ForkButtonProps> = ({
   const handleFork = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      setError('You must be logged in to fork ideas');
+      return;
+    }
+    
     if (!title.trim()) {
       setError('Title is required');
       return;
@@ -40,22 +51,20 @@ export const ForkButton: React.FC<ForkButtonProps> = ({
       setIsLoading(true);
       setError('');
 
-      // Use the fork_idea RPC
-      const { data: newIdeaId, error } = await supabase.rpc('fork_idea', {
-        parent_idea_id: idea.id,
-        new_title: title,
-        new_description: description
-      });
+      // Use the API client to fork the idea
+      const { data, error: forkError } = await apiClient.forkIdea(idea.id, user.id);
 
-      if (error) {
-        throw error;
+      if (forkError) {
+        throw new Error(forkError);
       }
 
       // Close modal
       handleCloseModal();
       
       // Navigate to the new idea's page
-      router.push(`/idea/${newIdeaId}`);
+      if (data?.id) {
+        router.push(`/ideas/${data.id}`);
+      }
     } catch (err: any) {
       console.error('Failed to fork idea:', err);
       setError(err.message || 'Failed to fork idea');

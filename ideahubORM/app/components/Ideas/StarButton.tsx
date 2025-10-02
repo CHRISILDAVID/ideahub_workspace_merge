@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { supabase } from '@/app/lib/supabase';
+import { apiClient } from '@/app/lib/api-client';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface StarButtonProps {
   ideaId: string;
@@ -17,15 +18,19 @@ export const StarButton: React.FC<StarButtonProps> = ({
   const [isStarred, setIsStarred] = useState(isInitiallyStarred);
   const [starCount, setStarCount] = useState(initialStarCount);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   const handleToggleStar = async () => {
+    if (!user) {
+      console.error('User must be logged in to star ideas');
+      return;
+    }
+
     try {
       setIsLoading(true);
       
-      // Use the toggle_star RPC
-      const { data, error } = await supabase.rpc('toggle_star', {
-        idea_id_to_toggle: ideaId
-      });
+      // Use the API client to toggle star
+      const { data, error } = await apiClient.toggleLike(ideaId, user.id);
 
       if (error) {
         console.error('Error toggling star:', error);
@@ -33,8 +38,10 @@ export const StarButton: React.FC<StarButtonProps> = ({
       }
 
       // Update local state based on the response
-      setIsStarred(data.is_starred);
-      setStarCount(prev => data.is_starred ? prev + 1 : prev - 1);
+      // Toggle the star state
+      const newIsStarred = !isStarred;
+      setIsStarred(newIsStarred);
+      setStarCount(prev => newIsStarred ? prev + 1 : prev - 1);
     } catch (error) {
       console.error('Failed to toggle star:', error);
     } finally {

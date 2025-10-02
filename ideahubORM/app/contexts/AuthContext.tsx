@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/app/lib/supabase';
-import { supabaseApi } from '@/app/services/api/index';
 import { User } from '@/app/types';
-import { authCookieManager } from '@/app/utils/authCookieManager';
 
 interface AuthContextType {
   user: User | null;
@@ -26,176 +23,139 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-    let authSubscription: any;
-
-    // Enhanced session initialization with cookie support
+    // Initialize auth state from localStorage
     const initializeAuth = async () => {
       try {
         console.log('AuthContext: Initializing authentication...');
         
-        // First, try to get the current session from cookies
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('AuthContext: Error getting session:', sessionError);
-        }
-
-        if (mounted && session?.user) {
-          console.log('AuthContext: Found existing session for user:', session.user.id);
-          try {
-            const currentUser = await supabaseApi.getCurrentUser();
-            if (mounted) {
-              setUser(currentUser);
-              console.log('AuthContext: User loaded from session:', currentUser?.username);
-            }
-          } catch (userError) {
-            console.error('AuthContext: Error getting current user:', userError);
-            if (mounted) {
-              setUser(null);
-            }
-          }
+        // Try to restore user from localStorage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          console.log('AuthContext: Restored user from localStorage:', parsedUser.username);
+          setUser(parsedUser);
         } else {
-          console.log('AuthContext: No existing session found');
-          if (mounted) {
-            setUser(null);
-          }
+          console.log('AuthContext: No stored user found');
         }
       } catch (error) {
         console.error('AuthContext: Error initializing auth:', error);
-        if (mounted) {
-          setUser(null);
-        }
+        setUser(null);
       } finally {
-        if (mounted) {
-          setIsLoading(false);
-          setIsInitialized(true);
-        }
+        setIsLoading(false);
       }
     };
 
-    // Set up auth state change listener
-    const setupAuthListener = () => {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, session) => {
-          console.log('AuthContext: Auth state changed:', event, session?.user?.id);
-          
-          if (!mounted) return;
-
-          try {
-            if (event === 'SIGNED_IN' && session?.user) {
-              console.log('AuthContext: User signed in, loading profile...');
-              const currentUser = await supabaseApi.getCurrentUser();
-              if (mounted) {
-                setUser(currentUser);
-                setIsLoading(false);
-              }
-            } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-              console.log('AuthContext: Token refreshed, updating user...');
-              const currentUser = await supabaseApi.getCurrentUser();
-              if (mounted) {
-                setUser(currentUser);
-              }
-            } else if (event === 'SIGNED_OUT') {
-              console.log('AuthContext: User signed out');
-              if (mounted) {
-                setUser(null);
-                setIsLoading(false);
-              }
-            }
-          } catch (error) {
-            console.error('AuthContext: Error handling auth state change:', error);
-            if (mounted) {
-              setUser(null);
-              setIsLoading(false);
-            }
-          }
-        }
-      );
-      
-      authSubscription = subscription;
-    };
-
-    // Initialize authentication
-    initializeAuth().then(() => {
-      if (mounted) {
-        setupAuthListener();
-      }
-    });
-
-    return () => {
-      mounted = false;
-      if (authSubscription) {
-        authSubscription.unsubscribe();
-      }
-    };
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
     setIsLoading(true);
     try {
-      await supabaseApi.signIn(email, password);
-      // User will be set via onAuthStateChange
+      // Call the auth API endpoint
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      if (data.user) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('AuthContext: User logged in:', data.user.username);
+      }
     } catch (error) {
-      setIsLoading(false);
+      console.error('AuthContext: Login error:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const register = async (userData: RegisterData): Promise<void> => {
     setIsLoading(true);
     try {
-      await supabaseApi.signUp(userData.email, userData.password, {
-        username: userData.username,
-        fullName: userData.fullName,
+      // Call the users API endpoint to create a new user
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password,
+          username: userData.username,
+          fullName: userData.fullName,
+        }),
       });
-      // User will be set via onAuthStateChange after email confirmation
-      setIsLoading(false);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      if (data.user) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('AuthContext: User registered:', data.user.username);
+      }
     } catch (error) {
-      setIsLoading(false);
+      console.error('AuthContext: Registration error:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = (): void => {
-    // Use the cookie manager for comprehensive logout
-    authCookieManager.clearAuth();
-    // User will be cleared via onAuthStateChange
+    console.log('AuthContext: Logging out user');
+    setUser(null);
+    localStorage.removeItem('user');
+    
+    // Call the logout API endpoint
+    fetch('/api/auth/logout', {
+      method: 'POST',
+    }).catch(error => {
+      console.error('AuthContext: Logout API error:', error);
+    });
   };
 
   const updateProfile = async (userData: Partial<User>): Promise<void> => {
     if (!user) return;
     setIsLoading(true);
     try {
-      // Map from frontend User type to database fields
-      const dbUserData: any = {
-        ...(userData.username && { username: userData.username }),
-        ...(userData.fullName && { full_name: userData.fullName }),
-        ...(userData.avatar && { avatar_url: userData.avatar }),
-        ...(userData.bio && { bio: userData.bio }),
-        ...(userData.location && { location: userData.location }),
-        ...(userData.website && { website: userData.website }),
-        updated_at: new Date().toISOString()
-      };
+      // Call the users API endpoint to update the user
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
-      const { error } = await supabase
-        .from('users')
-        .update(dbUserData)
-        .eq('id', user.id as any);
+      const data = await response.json();
 
-      if (error) {
-        console.error('Error updating profile:', error);
-        throw error;
+      if (!response.ok) {
+        throw new Error(data.error || 'Update failed');
       }
 
-      // Fetch updated user data
-      const updatedUser = await supabaseApi.getCurrentUser();
-      setUser(updatedUser);
+      if (data.user) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('AuthContext: User profile updated:', data.user.username);
+      }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('AuthContext: Update profile error:', error);
       throw error;
     } finally {
       setIsLoading(false);

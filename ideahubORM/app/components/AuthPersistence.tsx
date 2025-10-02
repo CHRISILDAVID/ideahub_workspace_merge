@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/app/lib/supabase';
 
 interface AuthPersistenceProps {
   children: React.ReactNode;
@@ -8,6 +7,9 @@ interface AuthPersistenceProps {
 /**
  * Component that ensures authentication state is properly restored from cookies
  * Should wrap the entire app to handle auth persistence
+ * 
+ * Note: This is a stub implementation for the Prisma migration.
+ * Auth persistence is now handled by AuthContext.
  */
 export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -15,18 +17,9 @@ export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) =>
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        console.log('AuthPersistence: Initializing auth state from cookies...');
-        
-        // This will automatically read from cookies and set up the session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('AuthPersistence: Error getting session:', error);
-        } else if (session) {
-          console.log('AuthPersistence: Session restored from cookies for user:', session.user?.id);
-        } else {
-          console.log('AuthPersistence: No session found in cookies');
-        }
+        console.log('AuthPersistence: Initializing auth state...');
+        // Auth state is now managed by AuthContext using localStorage/cookies
+        // This component just provides a loading screen briefly
       } catch (error) {
         console.error('AuthPersistence: Error initializing auth persistence:', error);
       } finally {
@@ -34,7 +27,12 @@ export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) =>
       }
     };
 
-    initializeAuth();
+    // Simulate brief initialization
+    const timer = setTimeout(() => {
+      initializeAuth();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Show loading while initializing auth

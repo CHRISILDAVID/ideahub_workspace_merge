@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { CanvasEditor } from '@/app/components/Canvas/CanvasEditor';
 import { CanvasToolbar, CanvasTool } from '@/app/components/Canvas/CanvasToolbar';
 import { ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation' from 'next/link';
+import { useRouter } from 'next/navigation'
+import Link from 'next/link';
 
 interface CanvasObject {
   id: string;

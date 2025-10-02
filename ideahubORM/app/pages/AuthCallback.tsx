@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation' from 'next/link';
+import { useRouter } from 'next/navigation'
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { authCookieManager } from '@/app/utils/authCookieManager';
 import { Loader2 } from 'lucide-react';

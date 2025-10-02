@@ -6,7 +6,7 @@ import {
   ActivitiesService,
   StatsService
 } from '@/app/services/api/index';
-import { User, Idea, Comment, Notification, Activity, SearchFilters, ApiResponse } from '@/app/services/app/types';
+import { User, Idea, Comment, Notification, Activity, SearchFilters, ApiResponse } from '@/app/types';
 
 // Wrapper API that uses the structured modular services
 // This maintains the same interface for the frontend while using clean, modular backend services

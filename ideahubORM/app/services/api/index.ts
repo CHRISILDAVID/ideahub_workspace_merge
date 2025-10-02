@@ -1,10 +1,10 @@
 // Import and re-export all API services and utilities
-import { AuthService } from '@/app/services/auth';
-import { IdeasService } from '@/app/services/ideas';
-import { UsersService } from '@/app/services/users';
-import { NotificationsService } from '@/app/services/notifications';
-import { ActivitiesService } from '@/app/services/activities';
-import { StatsService } from '@/app/services/stats';
+import { AuthService } from './auth';
+import { IdeasService } from './ideas';
+import { UsersService } from './users';
+import { NotificationsService } from './notifications';
+import { ActivitiesService } from './activities';
+import { StatsService } from './stats';
 
 // Re-export all services
 export { AuthService, IdeasService, UsersService, NotificationsService, ActivitiesService, StatsService };
@@ -17,7 +17,7 @@ export {
   type DbUser,
   type DbIdea,
   type DbComment,
-} from '@/app/services/transformers';
+} from './transformers';
 
 // Re-export utilities
 export {
@@ -25,7 +25,7 @@ export {
   castToInsert,
   castToUpdate,
   castFromSupabase,
-} from '@/app/services/utils';
+} from './utils';
 
 // Main API object for backward compatibility
 export const supabaseApi = {

@@ -37,42 +37,52 @@ export default function RoutePage() {
 }
 ```
 
-### Step 3: Import Paths & Navigation ✅
-Updated 36+ files with:
+### Step 3: Import Paths & Navigation ✅ **COMPLETED**
+Updated 40+ files with:
 - ✅ All relative imports → absolute `@/app/*` paths
 - ✅ React Router → Next.js navigation
   - `Link from 'react-router-dom'` → `Link from 'next/link'`
   - `useNavigate()` → `useRouter()`
-  - `useLocation()` → `usePathname()`
+  - `useLocation()` → `usePathname()` + `useSearchParams()`
   - `<Link to="">` → `<Link href="">`
 - ✅ Updated ProtectedRoute component to use Next.js router
 - ✅ Layout configured with ThemeProvider and AuthProvider
+- ✅ **All Supabase imports removed/replaced**
+- ✅ **Service layer stubbed for Step 4**
+- ✅ **SSR issues fixed (localStorage checks)**
+- ✅ **Server starts without errors!**
 
 ## 🚧 What Needs to Be Done (Steps 4-10)
 
-### Step 4: Replace Supabase API Calls (IN PROGRESS)
-**Current State:** Services still use Supabase client
+### Step 4: Replace Supabase API Calls (IN PROGRESS - READY TO START)
+**Current State:** Service layer has stub implementations without Supabase dependencies
 
-**Files that need updating:**
+**Service files ready for implementation:**
 - `app/services/api.ts` - Main API wrapper
-- `app/services/api/auth.ts` - Auth service
-- `app/services/api/ideas.ts` - Ideas service
-- `app/services/api/users.ts` - Users service
-- `app/contexts/AuthContext.tsx` - Auth context
-- `app/components/AuthPersistence.tsx`
-- `app/components/Ideas/StarButton.tsx`
-- `app/components/Ideas/ForkButton.tsx`
-- `app/pages/AuthCallback.tsx`
+- `app/services/api/auth.ts` - Auth service (stubbed)
+- `app/services/api/ideas.ts` - Ideas service (stubbed)
+- `app/services/api/users.ts` - Users service (stubbed)
+- `app/services/api/notifications.ts` - Notifications service (stubbed)
+- `app/services/api/activities.ts` - Activities service (stubbed)
+- `app/services/api/stats.ts` - Stats service (stubbed)
+
+**Components already updated:**
+- `app/contexts/AuthContext.tsx` - Uses fetch to API routes
+- `app/components/AuthPersistence.tsx` - No Supabase dependency
+- `app/components/Ideas/StarButton.tsx` - Uses apiClient
+- `app/components/Ideas/ForkButton.tsx` - Uses apiClient
+- `app/pages/AuthCallback.tsx` - Stub ready for auth implementation
 
 **Strategy:**
-Replace Supabase calls with the existing `apiClient` from `@/app/lib/api-client`:
+Replace stub implementations with the existing `apiClient` from `@/app/lib/api-client`:
 
 ```typescript
-// Before (Supabase)
-const { data } = await supabase.from('ideas').select('*');
-
-// After (API Client)
-const { data } = await apiClient.getIdeas();
+// Example: Replace stub in ideas.ts
+static async getIdeas(filters?: Partial<SearchFilters>): Promise<ApiResponse<Idea[]>> {
+  const response = await fetch('/api/ideas?' + new URLSearchParams(filters));
+  const data = await response.json();
+  return { data, success: response.ok };
+}
 ```
 
 ### Step 5: Implement Authentication
@@ -225,15 +235,20 @@ npm run start            # Production server
    - May fail in restricted environments
    - Can work around by focusing on code structure
 
-2. **Supabase Dependencies:** Still present in:
-   - Service layer (`app/services/api/`)
-   - Auth context
-   - Some components
+2. ~~**Supabase Dependencies:** Still present in service layer~~ ✅ **FIXED**
+   - ✅ Service layer now has stub implementations
+   - ✅ No Supabase imports remaining
+   - Ready for Step 4 implementation
 
-3. **Authentication:** Needs full implementation
+3. **Authentication:** Needs full implementation (Step 5)
    - No auth middleware yet
    - No auth API routes yet
-   - AuthContext still uses Supabase
+   - AuthContext uses localStorage (temporary solution)
+
+4. **Service Layer:** Returns empty data (Step 4)
+   - All services return stubs with empty arrays/errors
+   - Marked with `TODO: Step 4` comments
+   - Ready to be connected to API routes
 
 ## 📚 Documentation
 
@@ -243,24 +258,35 @@ npm run start            # Production server
 - `ideahubORM/MIGRATION_GUIDE.md` - Database schema and user flows
 - `ideahubORM/API_DOCUMENTATION.md` - API endpoint reference
 
-## 🎉 Progress: 70% Complete
+## 🎉 Progress: 75% Complete
 
 - [x] Database schema & API routes
 - [x] Frontend components
 - [x] Next.js App Router pages
 - [x] Import paths updated
 - [x] React Router → Next.js
-- [ ] Supabase API replacement
+- [x] **All Supabase imports removed** ✅
+- [x] **Server starts without errors** ✅
+- [ ] Supabase API replacement (service implementation)
 - [ ] Authentication implementation
 - [ ] Testing
 - [ ] Deployment
 
 ## 👤 Next Developer Tasks
 
-1. **Immediate (Step 4):** Replace Supabase calls in services with apiClient
-2. **High Priority (Step 5):** Implement authentication (auth routes + middleware)
-3. **Medium Priority (Step 6-7):** Complete navigation and workspace integration
-4. **Before Launch (Step 8-10):** Testing, error handling, deployment
+**Immediate (Step 4):** Replace service layer stubs with actual API client calls
+- Each service file has stub methods returning empty data
+- Connect to existing API routes in `/api`
+- Use fetch or apiClient from `@/app/lib/api-client`
+
+**High Priority (Step 5):** Implement authentication 
+- Create auth API routes (login, logout, session)
+- Add authentication middleware
+- Complete AuthContext integration
+
+**Medium Priority (Step 6-7):** Complete navigation and workspace integration
+
+**Before Launch (Step 8-10):** Testing, error handling, deployment
 
 ---
 

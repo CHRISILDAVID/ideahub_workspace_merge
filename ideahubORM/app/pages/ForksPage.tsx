@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from '../components/Layout/Layout';
-import { IdeaCard } from '../components/Ideas/IdeaCard';
+import { Layout } from '@/app/components/Layout/Layout';
+import { IdeaCard } from '@/app/components/Ideas/IdeaCard';
 import { GitFork, Loader2 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
-import { Idea } from '../types';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { api } from '@/app/services/api';
+import { Idea } from '@/app/types';
 
 export const ForksPage: React.FC = () => {
   const { user, isAuthenticated } = useAuth();

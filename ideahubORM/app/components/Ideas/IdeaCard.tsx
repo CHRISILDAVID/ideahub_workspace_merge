@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { MessageCircle, Clock, Eye, GitFork } from 'lucide-react';
-import { Idea } from '../../types';
-import { useAuthGuard } from '../../hooks/useAuthGuard';
+import { Idea } from '@/app/types';
+import { useAuthGuard } from '@/app/hooks/useAuthGuard';
 import { StarButton } from './StarButton';
 import { ForkButton } from './ForkButton';
 
@@ -33,7 +33,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
-            <Link to={`/profile/${idea.author.username}`}>
+            <Link href={`/profile/${idea.author.username}`}>
               <img
                 src={idea.author.avatar || `https://ui-avatars.com/api/?name=${idea.author.fullName}&background=random`}
                 alt={idea.author.fullName}
@@ -74,7 +74,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
 
         {/* Title and Description */}
         <div className="mb-4">
-          <Link to={`/ideas/${idea.id}`}>
+          <Link href={`/ideas/${idea.id}`}>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 mb-2">
               {idea.title}
             </h3>

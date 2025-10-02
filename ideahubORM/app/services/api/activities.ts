@@ -1,6 +1,6 @@
 import { supabase, handleSupabaseError } from '../../lib/supabase';
 import { Activity, ApiResponse } from '../../types';
-import { transformDbUser, createBasicIdea, DbUser } from './transformers';
+import { transformDbUser, createBasicIdea, DbUser } from '@/app/services/transformers';
 
 export class ActivitiesService {
   /**

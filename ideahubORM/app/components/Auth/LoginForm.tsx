@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export const LoginForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -10,7 +11,7 @@ export const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   React.useEffect(() => {
     const errorParam = searchParams.get('error');
@@ -30,7 +31,7 @@ export const LoginForm: React.FC = () => {
       
       // Redirect to intended destination or home page
       const redirectTo = searchParams.get('redirect') || '/';
-      navigate(redirectTo, { replace: true });
+      router.push(redirectTo, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid email or password');
     }
@@ -40,7 +41,7 @@ export const LoginForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link to="/" className="flex items-center justify-center space-x-2">
+          <Link href="/" className="flex items-center justify-center space-x-2">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">IH</span>
             </div>

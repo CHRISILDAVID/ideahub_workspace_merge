@@ -1,7 +1,7 @@
 import { supabase, handleSupabaseError } from '../../lib/supabase';
 import { Notification, ApiResponse } from '../../types';
-import { transformDbUser, DbUser } from './transformers';
-import { AuthService } from './auth';
+import { transformDbUser, DbUser } from '@/app/services/transformers';
+import { AuthService } from '@/app/services/auth';
 
 export class NotificationsService {
   /**

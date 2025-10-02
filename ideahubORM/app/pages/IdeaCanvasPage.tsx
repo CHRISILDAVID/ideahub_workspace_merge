@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import { 
   FileText, 
   Layout, 
@@ -33,15 +33,15 @@ import {
   RotateCcw,
   GripVertical
 } from 'lucide-react';
-import { CanvasEditor } from '../components/Canvas/CanvasEditor';
-import { DocumentEditor } from '../components/Canvas/DocumentEditor';
-import { CanvasToolbar, CanvasTool } from '../components/Canvas/CanvasToolbar';
-import { DocumentToolbar } from '../components/Canvas/DocumentToolbar';
-import { ViewToggle } from '../components/Canvas/ViewToggle';
-import { IdeaSetupModal } from '../components/Canvas/IdeaSetupModal';
-import { api } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
-import { Idea } from '../types';
+import { CanvasEditor } from '@/app/components/Canvas/CanvasEditor';
+import { DocumentEditor } from '@/app/components/Canvas/DocumentEditor';
+import { CanvasToolbar, CanvasTool } from '@/app/components/Canvas/CanvasToolbar';
+import { DocumentToolbar } from '@/app/components/Canvas/DocumentToolbar';
+import { ViewToggle } from '@/app/components/Canvas/ViewToggle';
+import { IdeaSetupModal } from '@/app/components/Canvas/IdeaSetupModal';
+import { api } from '@/app/services/api';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { Idea } from '@/app/types';
 
 interface CanvasObject {
   id: string;
@@ -64,7 +64,7 @@ type ViewMode = 'document' | 'both' | 'canvas';
 
 export const IdeaCanvasPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const router = useRouter();
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   
@@ -193,7 +193,7 @@ export const IdeaCanvasPage: React.FC = () => {
         const response = await api.createIdea(newIdeaData);
         setIdea(response.data);
         setIsNewIdea(false);
-        navigate(`/ideas/${response.data.id}`);
+        router.push(`/ideas/${response.data.id}`);
       } else if (idea) {
         // Update existing idea
         const updatedIdeaData = {
@@ -253,13 +253,13 @@ export const IdeaCanvasPage: React.FC = () => {
 
   const handleFork = async () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      router.push('/login');
       return;
     }
 
     try {
       const response = await api.forkIdea(id!);
-      navigate(`/ideas/${response.data.id}/edit`);
+      router.push(`/ideas/${response.data.id}/edit`);
     } catch (err) {
       console.error('Error forking idea:', err);
     }
@@ -300,7 +300,7 @@ export const IdeaCanvasPage: React.FC = () => {
             {error}
           </h2>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => router.push('/')}
             className="text-blue-600 hover:text-blue-500 dark:text-blue-400"
           >
             Go back to home
@@ -317,7 +317,7 @@ export const IdeaCanvasPage: React.FC = () => {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => router.push(-1)}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -477,7 +477,7 @@ export const IdeaCanvasPage: React.FC = () => {
       {showSetupModal && (
         <IdeaSetupModal
           onComplete={handleSetupComplete}
-          onCancel={() => navigate('/')}
+          onCancel={() => router.push('/')}
         />
       )}
     </div>

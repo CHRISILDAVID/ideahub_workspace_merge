@@ -1,7 +1,7 @@
 import { supabase, handleSupabaseError } from '../../lib/supabase';
 import { Idea, SearchFilters, ApiResponse } from '../../types';
-import { transformDbIdea } from './transformers';
-import { AuthService } from './auth';
+import { transformDbIdea } from '@/app/services/transformers';
+import { AuthService } from '@/app/services/auth';
 
 export class IdeasService {
   /**

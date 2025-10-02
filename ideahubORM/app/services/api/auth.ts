@@ -1,6 +1,6 @@
 import { supabase, handleSupabaseError } from '../../lib/supabase';
 import { User } from '../../types';
-import { transformDbUser, DbUser } from './transformers';
+import { transformDbUser, DbUser } from '@/app/services/transformers';
 
 export class AuthService {
   /**

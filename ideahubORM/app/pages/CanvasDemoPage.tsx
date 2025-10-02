@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { CanvasEditor } from '../components/Canvas/CanvasEditor';
-import { CanvasToolbar, CanvasTool } from '../components/Canvas/CanvasToolbar';
+import { CanvasEditor } from '@/app/components/Canvas/CanvasEditor';
+import { CanvasToolbar, CanvasTool } from '@/app/components/Canvas/CanvasToolbar';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 interface CanvasObject {
   id: string;
@@ -40,7 +40,7 @@ interface CanvasObject {
 }
 
 export const CanvasDemoPage: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [activeTool, setActiveTool] = useState<CanvasTool>('select');
   const [canvasObjects, setCanvasObjects] = useState<CanvasObject[]>([]);
 
@@ -56,7 +56,7 @@ export const CanvasDemoPage: React.FC = () => {
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => router.push(-1)}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

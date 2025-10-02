@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
-import { Idea } from '../../types';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/app/lib/supabase';
+import { Idea } from '@/app/types';
 
 interface ForkButtonProps {
   idea: Idea;
@@ -12,7 +12,7 @@ export const ForkButton: React.FC<ForkButtonProps> = ({
   idea,
   className = '',
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState(`${idea.title} - variation`);
@@ -55,7 +55,7 @@ export const ForkButton: React.FC<ForkButtonProps> = ({
       handleCloseModal();
       
       // Navigate to the new idea's page
-      navigate(`/idea/${newIdeaId}`);
+      router.push(`/idea/${newIdeaId}`);
     } catch (err: any) {
       console.error('Failed to fork idea:', err);
       setError(err.message || 'Failed to fork idea');

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export const RegisterForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -17,12 +18,12 @@ export const RegisterForm: React.FC = () => {
   const [error, setError] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const { register, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Check for confirmation success
   React.useEffect(() => {
     if (searchParams.get('confirmed') === 'true') {
-      navigate('/?welcome=true');
+      router.push('/?welcome=true');
     }
   }, [searchParams, navigate]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +65,7 @@ export const RegisterForm: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
+            <Link href="/" className="flex items-center justify-center space-x-2 mb-8">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">IH</span>
               </div>
@@ -123,7 +124,7 @@ export const RegisterForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link to="/" className="flex items-center justify-center space-x-2">
+          <Link href="/" className="flex items-center justify-center space-x-2">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">IH</span>
             </div>
@@ -282,11 +283,11 @@ export const RegisterForm: React.FC = () => {
 
           <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
             By creating an account, you agree to our{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
+            <Link href="/terms" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
+            <Link href="/privacy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
               Privacy Policy
             </Link>
           </div>

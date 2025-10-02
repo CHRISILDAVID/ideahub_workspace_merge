@@ -30,14 +30,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         console.log('AuthContext: Initializing authentication...');
         
-        // Try to restore user from localStorage
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          console.log('AuthContext: Restored user from localStorage:', parsedUser.username);
-          setUser(parsedUser);
-        } else {
-          console.log('AuthContext: No stored user found');
+        // Try to restore user from localStorage (client-side only)
+        if (typeof window !== 'undefined') {
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            console.log('AuthContext: Restored user from localStorage:', parsedUser.username);
+            setUser(parsedUser);
+          } else {
+            console.log('AuthContext: No stored user found');
+          }
         }
       } catch (error) {
         console.error('AuthContext: Error initializing auth:', error);

@@ -19,17 +19,26 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize theme from localStorage after mount (client-side only)
+  useEffect(() => {
+    setMounted(true);
     const savedTheme = localStorage.getItem('theme') as Theme;
-    return savedTheme || 'light';
-  });
+    if (savedTheme) {
+      setThemeState(savedTheme);
+    }
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+    
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const toggleTheme = () => {
     setThemeState(prev => prev === 'light' ? 'dark' : 'light');

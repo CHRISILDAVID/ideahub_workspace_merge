@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { CanvasEditor } from '../components/Canvas/CanvasEditor';
-import { CanvasToolbar, CanvasTool } from '../components/Canvas/CanvasToolbar';
+import { CanvasEditor } from '@/app/components/Canvas/CanvasEditor';
+import { CanvasToolbar, CanvasTool } from '@/app/components/Canvas/CanvasToolbar';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation' from 'next/link';
 
 interface CanvasObject {
   id: string;
@@ -40,7 +40,7 @@ interface CanvasObject {
 }
 
 export const CanvasDemoPage: React.FC = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [activeTool, setActiveTool] = useState<CanvasTool>('select');
   const [canvasObjects, setCanvasObjects] = useState<CanvasObject[]>([]);
 

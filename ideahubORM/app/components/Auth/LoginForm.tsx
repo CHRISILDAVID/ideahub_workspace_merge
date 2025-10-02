@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'next/link';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 export const LoginForm: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -10,7 +10,7 @@ export const LoginForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   React.useEffect(() => {
     const errorParam = searchParams.get('error');

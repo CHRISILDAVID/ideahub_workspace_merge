@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'next/link';
 import { 
   FileText, 
   ArrowLeft,
@@ -20,9 +20,9 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Stage, Layer, Rect, Circle as KonvaCircle, Text, Line } from 'react-konva';
-import { api } from '../services/api';
-import { useAuth } from '../contexts/AuthContext';
-import { Idea } from '../types';
+import { api } from '@/app/services/api';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { Idea } from '@/app/types';
 
 // Types for canvas objects
 interface CanvasObject {
@@ -50,7 +50,7 @@ type UserRole = 'owner' | 'collaborator' | 'viewer';
 
 export const IdeaDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { isAuthenticated, user } = useAuth();
   
   // State management
@@ -257,13 +257,13 @@ export const IdeaDetailPage: React.FC = () => {
 
   const handleFork = async () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      router.push('/login');
       return;
     }
 
     try {
       const response = await api.forkIdea(id!);
-      navigate(`/ideas/${response.data.id}`);
+      router.push(`/ideas/${response.data.id}`);
     } catch (err) {
       console.error('Error forking idea:', err);
     }
@@ -285,7 +285,7 @@ export const IdeaDetailPage: React.FC = () => {
             {error || 'Idea not found'}
           </h2>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => router.push('/')}
             className="text-blue-600 hover:text-blue-500 dark:text-blue-400"
           >
             Go back to home

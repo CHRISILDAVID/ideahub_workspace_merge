@@ -1,4 +1,4 @@
-import { User, Idea } from '../../types';
+import { User, Idea } from '@/app/types';
 import { Database } from '../../types/database';
 
 export type DbUser = Database['public']['Tables']['users']['Row'];

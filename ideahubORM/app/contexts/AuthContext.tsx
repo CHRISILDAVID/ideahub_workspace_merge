@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import { supabaseApi } from '../services/api/index';
-import { User } from '../types';
-import { authCookieManager } from '../utils/authCookieManager';
+import { supabase } from '@/lib/supabase';
+import { supabaseApi } from '@/app/services/api/index';
+import { User } from '@/app/types';
+import { authCookieManager } from '@/app/utils/authCookieManager';
 
 interface AuthContextType {
   user: User | null;

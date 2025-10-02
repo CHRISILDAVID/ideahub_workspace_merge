@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from '../components/Layout/Layout';
-import { IdeaList } from '../components/Ideas/IdeaList';
+import { Layout } from '@/app/components/Layout/Layout';
+import { IdeaList } from '@/app/components/Ideas/IdeaList';
 import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
-import { SearchFilters } from '../types';
+import { SearchFilters } from '@/app/types';
 
 export const ExplorePage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');

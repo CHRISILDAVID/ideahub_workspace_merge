@@ -1,5 +1,5 @@
-import { supabase, handleSupabaseError } from '../../lib/supabase';
-import { ApiResponse } from '../../types';
+import { supabase, handleSupabaseError } from '@/lib/supabase';
+import { ApiResponse } from '@/app/types';
 
 export class StatsService {
   /**

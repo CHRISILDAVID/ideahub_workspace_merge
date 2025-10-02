@@ -1,41 +1,25 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/app/lib/supabase';
-import { authCookieManager } from '@/app/utils/authCookieManager';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * Auth callback page for email confirmation
+ * Note: This is a stub implementation for the Prisma migration.
+ * Actual auth implementation will be added in Step 5.
+ */
 export const AuthCallback: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // First, try to get the session from the URL hash
-        const { data, error } = await supabase.auth.getSession();
+        console.log('AuthCallback: Processing authentication callback...');
         
-        if (error) {
-          console.error('Auth callback error:', error);
-          router.push('/login?error=confirmation_failed');
-          return;
-        }
-
-        if (data.session) {
-          // Session exists, ensure cookies are properly set
-          await authCookieManager.initializeFromCookies();
-          
-          // User is confirmed and logged in
+        // For now, just redirect to home
+        // In Step 5, this will handle email confirmation and session setup
+        setTimeout(() => {
           router.push('/?confirmed=true');
-        } else {
-          // No session, check if we can restore from cookies
-          const authData = await authCookieManager.handlePageReload();
-          
-          if (authData?.session) {
-            router.push('/?confirmed=true');
-          } else {
-            // No valid session found, redirect to login
-            router.push('/login');
-          }
-        }
+        }, 1000);
       } catch (error) {
         console.error('Unexpected error during auth callback:', error);
         router.push('/login?error=unexpected');

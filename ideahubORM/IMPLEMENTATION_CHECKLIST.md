@@ -13,7 +13,20 @@ This checklist guides you through completing the migration from IDEA_HUB to idea
 - [x] Dependencies installed
 - [x] Database Setup (Step 1) - DATABASE_URL configured
 - [x] Route Pages Created (Step 2) - All page routes created for Next.js App Router
+- [x] Import Paths Updated (Step 3) - All relative imports converted to @/app/* format
+- [x] React Router Replaced (Step 3) - All navigation updated to Next.js equivalents
 - [x] Layout Updated (Step 6 partial) - ThemeProvider and AuthProvider added to layout
+
+## 🚧 In Progress / Remaining Tasks
+
+- [ ] Complete Supabase API Replacement (Step 4) - Services still use Supabase
+- [ ] Implement Authentication Middleware (Step 5)
+- [ ] Create Auth API Routes (Step 5)
+- [ ] Complete Navigation Updates (Step 6)
+- [ ] Connect Workspace to Ideas (Step 7)
+- [ ] Testing (Step 8)
+- [ ] Error Handling & Loading States (Step 9)
+- [ ] Deployment (Step 10)
 
 ## 🔨 Step-by-Step Implementation Guide
 
@@ -110,19 +123,93 @@ sed -i "s|from './|from '@/app/components/|g" app/components/**/*.tsx
 
 ### Step 4: Replace Supabase API Calls (2 hours)
 
+**Status: PARTIALLY COMPLETE** - Import paths updated, but Supabase service calls still need replacement
+
+**Current State:**
+- All import paths updated to use @/app/* format ✅
+- React Router replaced with Next.js navigation ✅
+- Supabase-based services still in use in:
+  - `app/services/api/auth.ts`
+  - `app/services/api/ideas.ts`
+  - `app/services/api/users.ts`
+  - `app/services/api/activities.ts`
+  - `app/services/api/notifications.ts`
+  - `app/services/api/stats.ts`
+  - `app/contexts/AuthContext.tsx`
+  - `app/components/AuthPersistence.tsx`
+  - `app/components/Ideas/StarButton.tsx`
+  - `app/components/Ideas/ForkButton.tsx`
+  - `app/pages/AuthCallback.tsx`
+  - `app/hooks/useSupabaseAuth.ts`
+
+**Required Changes:**
+
+1. **Update app/services/api.ts**
+   - Replace Supabase service calls with apiClient calls
+   - Example:
+   ```typescript
+   // Before
+   async getIdeas(filters?: Partial<SearchFilters>): Promise<ApiResponse<Idea[]>> {
+     return IdeasService.getIdeas(filters);
+   }
+   
+   // After
+   async getIdeas(filters?: Partial<SearchFilters>): Promise<ApiResponse<Idea[]>> {
+     const response = await apiClient.getIdeas(filters);
+     return {
+       data: response.data,
+       success: response.success,
+       error: response.error,
+     };
+   }
+   ```
+
+2. **Update AuthContext.tsx**
+   - Replace `supabase.auth` calls with API client
+   - Use `apiClient.createUser()` for signup
+   - Implement session management with cookies/localStorage
+   - Example:
+   ```typescript
+   const login = async (email: string, password: string) => {
+     const response = await fetch('/api/auth/login', {
+       method: 'POST',
+       body: JSON.stringify({ email, password }),
+     });
+     const data = await response.json();
+     if (data.user) {
+       setUser(data.user);
+       localStorage.setItem('user', JSON.stringify(data.user));
+     }
+   };
+   ```
+
+3. **Create API routes for authentication**
+   - `app/api/auth/login/route.ts` - Handle login with bcrypt
+   - `app/api/auth/logout/route.ts` - Clear session
+   - `app/api/auth/session/route.ts` - Get current session
+
 **Files to update:**
 
 1. **app/services/api/ideas.ts**
-   - Replace `supabase.from('ideas')` with `apiClient.getIdeas()`
-   - Replace all Supabase queries with API client calls
+   - Replace all Supabase queries with apiClient calls
+   ```typescript
+   // Before
+   const { data, error } = await supabase
+     .from('ideas')
+     .select('*')
+     .eq('visibility', 'public');
+   
+   // After
+   const { data, error } = await apiClient.getIdeas({ 
+     visibility: 'PUBLIC' 
+   });
+   ```
 
 2. **app/services/api/auth.ts**
-   - Replace `supabase.auth` with custom auth logic
-   - Use `apiClient.createUser()` for signup
-   - Implement session management
+   - Replace with API client calls or fetch to new auth routes
 
 3. **app/services/api/users.ts**
-   - Replace with `apiClient.getUser()`, etc.
+   - Replace with `apiClient.getUser()`, `apiClient.updateUser()`, etc.
 
 4. **Components using services**
    - Update imports to use new service layer

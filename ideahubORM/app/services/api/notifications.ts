@@ -1,86 +1,37 @@
-import { supabase, handleSupabaseError } from '@/lib/supabase';
 import { Notification, ApiResponse } from '@/app/types';
-import { transformDbUser, DbUser } from '@/app/services/api/transformers';
 import { AuthService } from './auth';
 
 export class NotificationsService {
   /**
    * Get notifications for the current user
+   * TODO: Implement with dedicated API endpoint
    */
   static async getNotifications(): Promise<ApiResponse<Notification[]>> {
     try {
       const userId = await AuthService.getCurrentUserId();
       if (!userId) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
-        .from('notifications')
-        .select(`
-          *,
-          related_user:users!notifications_related_user_id_fkey(*),
-          related_idea:ideas!notifications_related_idea_id_fkey(*)
-        `)
-        .eq('user_id', userId as any)
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-
-      const notifications: Notification[] = data?.map((item: any) => ({
-        id: item.id,
-        type: item.type as 'star' | 'fork' | 'comment' | 'mention' | 'follow' | 'issue',
-        message: item.message,
-        isRead: item.is_read,
-        createdAt: item.created_at,
-        relatedUser: item.related_user ? transformDbUser(item.related_user as DbUser) : undefined,
-        relatedIdea: item.related_idea ? {
-          id: item.related_idea.id,
-          title: item.related_idea.title,
-          description: item.related_idea.description,
-          content: item.related_idea.content,
-          author: transformDbUser(item.related_idea.author as DbUser),
-          tags: item.related_idea.tags,
-          category: item.related_idea.category,
-          license: item.related_idea.license,
-          version: item.related_idea.version,
-          stars: item.related_idea.stars,
-          forks: item.related_idea.forks,
-          isStarred: false,
-          isFork: item.related_idea.is_fork,
-          forkedFrom: item.related_idea.forked_from,
-          visibility: item.related_idea.visibility as 'public' | 'private',
-          createdAt: item.related_idea.created_at,
-          updatedAt: item.related_idea.updated_at,
-          collaborators: [],
-          comments: [],
-          issues: [],
-          language: item.related_idea.language,
-          status: item.related_idea.status as 'draft' | 'published' | 'archived',
-        } : undefined,
-        relatedUrl: item.related_url,
-      })) || [];
+      // Stub implementation - would need /api/notifications endpoint
+      console.warn('NotificationsService.getNotifications: Stub implementation, returning empty array');
 
       return {
-        data: notifications,
+        data: [],
         message: 'Notifications retrieved successfully',
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching notifications:', error);
       throw error;
     }
   }
 
   /**
    * Mark a notification as read
+   * TODO: Implement with dedicated API endpoint
    */
   static async markNotificationAsRead(notificationId: string): Promise<ApiResponse<void>> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true } as any)
-        .eq('id', notificationId as any);
-
-      if (error) throw error;
+      console.warn('NotificationsService.markNotificationAsRead: Stub implementation');
 
       return {
         data: undefined,
@@ -88,26 +39,21 @@ export class NotificationsService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error marking notification as read:', error);
       throw error;
     }
   }
 
   /**
    * Mark all notifications as read for the current user
+   * TODO: Implement with dedicated API endpoint
    */
   static async markAllNotificationsAsRead(): Promise<ApiResponse<void>> {
     try {
       const userId = await AuthService.getCurrentUserId();
       if (!userId) throw new Error('User not authenticated');
 
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true } as any)
-        .eq('user_id', userId as any)
-        .eq('is_read', false);
-
-      if (error) throw error;
+      console.warn('NotificationsService.markAllNotificationsAsRead: Stub implementation');
 
       return {
         data: undefined,
@@ -115,22 +61,18 @@ export class NotificationsService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error marking all notifications as read:', error);
       throw error;
     }
   }
 
   /**
    * Delete a notification
+   * TODO: Implement with dedicated API endpoint
    */
   static async deleteNotification(notificationId: string): Promise<ApiResponse<void>> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId as any);
-
-      if (error) throw error;
+      console.warn('NotificationsService.deleteNotification: Stub implementation');
 
       return {
         data: undefined,
@@ -138,13 +80,14 @@ export class NotificationsService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error deleting notification:', error);
       throw error;
     }
   }
 
   /**
    * Get unread notification count
+   * TODO: Implement with dedicated API endpoint
    */
   static async getUnreadCount(): Promise<ApiResponse<{ count: number }>> {
     try {
@@ -157,27 +100,22 @@ export class NotificationsService {
         };
       }
 
-      const { count, error } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId as any)
-        .eq('is_read', false);
-
-      if (error) throw error;
+      console.warn('NotificationsService.getUnreadCount: Stub implementation, returning 0');
 
       return {
-        data: { count: count || 0 },
+        data: { count: 0 },
         message: 'Unread count retrieved',
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error getting unread count:', error);
       throw error;
     }
   }
 
   /**
    * Create a notification (internal use)
+   * TODO: Implement with dedicated API endpoint
    */
   static async createNotification(
     userId: string,
@@ -188,18 +126,7 @@ export class NotificationsService {
     relatedUrl?: string
   ): Promise<ApiResponse<void>> {
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .insert({
-          user_id: userId,
-          type,
-          message,
-          related_user_id: relatedUserId,
-          related_idea_id: relatedIdeaId,
-          related_url: relatedUrl,
-        } as any);
-
-      if (error) throw error;
+      console.warn('NotificationsService.createNotification: Stub implementation');
 
       return {
         data: undefined,
@@ -207,7 +134,7 @@ export class NotificationsService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error creating notification:', error);
       throw error;
     }
   }

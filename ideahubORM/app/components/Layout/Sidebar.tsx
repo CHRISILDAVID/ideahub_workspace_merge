@@ -45,7 +45,7 @@ export const Sidebar: React.FC = () => {
             return (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                   isActive(item.path)
                     ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
@@ -72,7 +72,7 @@ export const Sidebar: React.FC = () => {
                 return (
                   <Link
                     key={item.path}
-                    to={item.path}
+                    href={item.path}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                       isActive(item.path)
                         ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'

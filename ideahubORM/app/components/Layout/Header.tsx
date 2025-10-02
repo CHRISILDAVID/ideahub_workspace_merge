@@ -70,7 +70,7 @@ export const Header: React.FC = () => {
               <>
                 {/* Create Button */}
                 <Link
-                  to="/create"
+                  href="/create"
                   className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   <Plus className="w-4 h-4" />
@@ -79,7 +79,7 @@ export const Header: React.FC = () => {
 
                 {/* Notifications */}
                 <Link
-                  to="/notifications"
+                  href="/notifications"
                   className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Bell className="w-5 h-5" />
@@ -113,7 +113,7 @@ export const Header: React.FC = () => {
                   {isProfileOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                       <Link
-                        to={`/profile/${user?.username}`}
+                        href={`/profile/${user?.username}`}
                         className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setIsProfileOpen(false)}
                       >
@@ -121,7 +121,7 @@ export const Header: React.FC = () => {
                         <span>Profile</span>
                       </Link>
                       <Link
-                        to="/settings"
+                        href="/settings"
                         className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setIsProfileOpen(false)}
                       >
@@ -143,13 +143,13 @@ export const Header: React.FC = () => {
             ) : (
               <>
                 <Link
-                  to="/login"
+                  href="/login"
                   className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
+                  href="/register"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                 >
                   Sign Up
@@ -188,7 +188,7 @@ export const Header: React.FC = () => {
               {isAuthenticated && (
                 <>
                   <Link
-                    to="/create"
+                    href="/create"
                     className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -196,7 +196,7 @@ export const Header: React.FC = () => {
                     <span>Create Idea</span>
                   </Link>
                   <Link
-                    to="/notifications"
+                    href="/notifications"
                     className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-2 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >

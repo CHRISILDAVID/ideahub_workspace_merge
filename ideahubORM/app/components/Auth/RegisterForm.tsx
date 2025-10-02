@@ -91,7 +91,7 @@ export const RegisterForm: React.FC = () => {
               
               <div className="space-y-3">
                 <Link
-                  to="/login"
+                  href="/login"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                 >
                   Go to Sign In
@@ -108,7 +108,7 @@ export const RegisterForm: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
                 Already have an account?{' '}
                 <Link
-                  to="/login"
+                  href="/login"
                   className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
                 >
                   Sign in here
@@ -136,7 +136,7 @@ export const RegisterForm: React.FC = () => {
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link
-              to="/login"
+              href="/login"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
               sign in to your existing account

@@ -53,7 +53,7 @@ export const LoginForm: React.FC = () => {
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link
-              to="/register"
+              href="/register"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
               create a new account
@@ -132,7 +132,7 @@ export const LoginForm: React.FC = () => {
 
             <div className="text-sm">
               <Link
-                to="/forgot-password"
+                href="/forgot-password"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
               >
                 Forgot your password?
@@ -158,7 +158,7 @@ export const LoginForm: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Need an account?{' '}
               <Link
-                to="/register"
+                href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
               >
                 Sign up here

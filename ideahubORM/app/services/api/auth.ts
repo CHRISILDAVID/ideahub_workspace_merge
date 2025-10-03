@@ -1,6 +1,4 @@
-import { supabase, handleSupabaseError } from '@/lib/supabase';
 import { User } from '@/app/types';
-import { transformDbUser, DbUser } from '@/app/services/api/transformers';
 
 export class AuthService {
   /**
@@ -8,23 +6,26 @@ export class AuthService {
    */
   static async signUp(email: string, password: string, userData: { username: string; fullName: string }) {
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username: userData.username,
-            full_name: userData.fullName,
-          },
-        },
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          password,
+          username: userData.username,
+          fullName: userData.fullName,
+        }),
       });
 
-      if (authError) throw authError;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Signup failed');
+      }
 
-      // The profile will be created automatically when getCurrentUser is called
-      return authData;
+      return await response.json();
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Signup error:', error);
+      throw error;
     }
   }
 
@@ -33,15 +34,21 @@ export class AuthService {
    */
   static async signIn(email: string, password: string) {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) throw error;
-      return data;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Login failed');
+      }
+
+      return await response.json();
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Login error:', error);
+      throw error;
     }
   }
 
@@ -50,10 +57,16 @@ export class AuthService {
    */
   static async signOut() {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Logout error:', error);
+      throw error;
     }
   }
 
@@ -62,58 +75,14 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<User | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const response = await fetch('/api/auth/session');
       
-      if (!user) return null;
-
-      // Try to get user profile
-      const { data: profile, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id as any)
-        .single();
-
-      if (error && error.code !== 'PGRST116') { // PGRST116 = not found
-        console.error('Error getting user profile:', error);
-        throw error;
+      if (!response.ok) {
+        return null;
       }
-      
-      if (!profile) {
-        // Profile doesn't exist, create a basic one from auth user
-        console.log('Creating missing user profile for:', user.id);
-        const newProfile = {
-          id: user.id,
-          username: user.user_metadata?.username || user.email?.split('@')[0] || 'user',
-          email: user.email,
-          full_name: user.user_metadata?.full_name || 'User',
-        };
 
-        const { data: createdProfile, error: createError } = await supabase
-          .from('users')
-          .insert(newProfile as any)
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('Error creating user profile:', createError);
-          // Return a basic user object even if profile creation fails
-          return {
-            id: user.id,
-            username: user.user_metadata?.username || user.email?.split('@')[0] || 'user',
-            email: user.email || '',
-            fullName: user.user_metadata?.full_name || 'User',
-            joinedAt: user.created_at || new Date().toISOString(),
-            followers: 0,
-            following: 0,
-            publicRepos: 0,
-            isVerified: false,
-          };
-        }
-
-        return transformDbUser(createdProfile as unknown as DbUser);
-      }
-      
-      return transformDbUser(profile as unknown as DbUser);
+      const data = await response.json();
+      return data.user || null;
     } catch (error) {
       console.error('Error getting current user:', error);
       return null;
@@ -125,7 +94,7 @@ export class AuthService {
    */
   static async getCurrentUserId(): Promise<string | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await this.getCurrentUser();
       return user?.id || null;
     } catch (error) {
       console.error('Error getting current user ID:', error);
@@ -138,7 +107,7 @@ export class AuthService {
    */
   static async isAuthenticated(): Promise<boolean> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await this.getCurrentUser();
       return !!user;
     } catch (error) {
       console.error('Error checking authentication:', error);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface AuthPersistenceProps {
   children: React.ReactNode;
@@ -10,6 +10,7 @@ interface AuthPersistenceProps {
  * Should wrap the entire app to handle auth persistence
  */
 export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) => {
+  const { isLoading, user, refreshSession } = useAuth();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -17,16 +18,10 @@ export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) =>
       try {
         console.log('AuthPersistence: Initializing auth state from cookies...');
         
-        // This will automatically read from cookies and set up the session
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // Trigger session refresh to check for existing session
+        await refreshSession();
         
-        if (error) {
-          console.error('AuthPersistence: Error getting session:', error);
-        } else if (session) {
-          console.log('AuthPersistence: Session restored from cookies for user:', session.user?.id);
-        } else {
-          console.log('AuthPersistence: No session found in cookies');
-        }
+        console.log('AuthPersistence: Session check complete');
       } catch (error) {
         console.error('AuthPersistence: Error initializing auth persistence:', error);
       } finally {
@@ -35,10 +30,10 @@ export const AuthPersistence: React.FC<AuthPersistenceProps> = ({ children }) =>
     };
 
     initializeAuth();
-  }, []);
+  }, [refreshSession]);
 
   // Show loading while initializing auth
-  if (!isInitialized) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">

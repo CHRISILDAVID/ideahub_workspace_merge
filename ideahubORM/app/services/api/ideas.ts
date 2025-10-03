@@ -1,6 +1,4 @@
-import { supabase, handleSupabaseError } from '@/lib/supabase';
 import { Idea, SearchFilters, ApiResponse } from '@/app/types';
-import { transformDbIdea } from '@/app/services/api/transformers';
 import { AuthService } from './auth';
 
 export class IdeasService {
@@ -9,55 +7,31 @@ export class IdeasService {
    */
   static async getIdeas(filters?: Partial<SearchFilters>): Promise<ApiResponse<Idea[]>> {
     try {
-      let query = supabase
-        .from('ideas')
-        .select(`
-          *,
-          author:users(*),
-          is_starred:stars!left(user_id)
-        `)
-        .eq('visibility', 'public')
-        .eq('status', 'published');
-
-      // Apply filters
+      const params = new URLSearchParams();
+      
       if (filters?.category && filters.category !== 'all') {
-        query = query.eq('category', filters.category);
+        params.append('category', filters.category);
       }
-
       if (filters?.language && filters.language !== 'all') {
-        query = query.eq('language', filters.language);
+        params.append('language', filters.language);
       }
-
       if (filters?.query) {
-        query = query.or(`title.ilike.%${filters.query}%,description.ilike.%${filters.query}%`);
+        params.append('query', filters.query);
+      }
+      if (filters?.sort) {
+        params.append('sort', filters.sort);
+      }
+      if (filters?.visibility) {
+        params.append('visibility', filters.visibility);
       }
 
-      // Apply sorting
-      switch (filters?.sort) {
-        case 'oldest':
-          query = query.order('created_at', { ascending: true });
-          break;
-        case 'most-stars':
-          query = query.order('stars', { ascending: false });
-          break;
-        case 'most-forks':
-          query = query.order('forks', { ascending: false });
-          break;
-        case 'recently-updated':
-          query = query.order('updated_at', { ascending: false });
-          break;
-        default:
-          query = query.order('created_at', { ascending: false });
+      const response = await fetch(`/api/ideas?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch ideas');
       }
 
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      const ideas = data?.map((item: any) => {
-        const isStarred = item.is_starred?.length > 0;
-        return transformDbIdea({ ...item, is_starred: isStarred });
-      }) || [];
+      const ideas = await response.json();
 
       return {
         data: ideas,
@@ -65,7 +39,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching ideas:', error);
       throw error;
     }
   }
@@ -75,20 +49,13 @@ export class IdeasService {
    */
   static async getIdea(id: string): Promise<ApiResponse<Idea>> {
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .select(`
-          *,
-          author:users(*),
-          is_starred:stars!left(user_id)
-        `)
-        .eq('id', id)
-        .single();
+      const response = await fetch(`/api/ideas/${id}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch idea');
+      }
 
-      if (error) throw error;
-
-      const isStarred = data.is_starred?.length > 0;
-      const idea = transformDbIdea({ ...data, is_starred: isStarred });
+      const idea = await response.json();
 
       return {
         data: idea,
@@ -96,7 +63,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching idea:', error);
       throw error;
     }
   }
@@ -109,30 +76,29 @@ export class IdeasService {
       const userId = await AuthService.getCurrentUserId();
       if (!userId) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
-        .from('ideas')
-        .insert({
-          title: ideaData.title!,
-          description: ideaData.description!,
-          content: ideaData.content!,
-          canvas_data: ideaData.canvasData,
-          author_id: userId,
+      const response = await fetch('/api/ideas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: ideaData.title,
+          description: ideaData.description,
+          content: ideaData.content || '',
+          authorId: userId,
           tags: ideaData.tags || [],
-          category: ideaData.category!,
+          category: ideaData.category,
           license: ideaData.license || 'MIT',
-          visibility: ideaData.visibility || 'public',
+          visibility: ideaData.visibility || 'PUBLIC',
           language: ideaData.language,
-          status: ideaData.status || 'published',
-        } as any)
-        .select(`
-          *,
-          author:users(*)
-        `)
-        .single();
+          status: ideaData.status || 'PUBLISHED',
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create idea');
+      }
 
-      const idea = transformDbIdea(data as any);
+      const idea = await response.json();
 
       return {
         data: idea,
@@ -140,7 +106,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error creating idea:', error);
       throw error;
     }
   }
@@ -150,30 +116,28 @@ export class IdeasService {
    */
   static async updateIdea(id: string, ideaData: Partial<Idea>): Promise<ApiResponse<Idea>> {
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .update({
+      const response = await fetch(`/api/ideas/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           title: ideaData.title,
           description: ideaData.description,
           content: ideaData.content,
-          canvas_data: ideaData.canvasData,
           tags: ideaData.tags,
           category: ideaData.category,
           license: ideaData.license,
           visibility: ideaData.visibility,
           language: ideaData.language,
           status: ideaData.status,
-        } as any)
-        .eq('id', id)
-        .select(`
-          *,
-          author:users(*)
-        `)
-        .single();
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to update idea');
+      }
 
-      const idea = transformDbIdea(data as any);
+      const idea = await response.json();
 
       return {
         data: idea,
@@ -181,7 +145,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error updating idea:', error);
       throw error;
     }
   }
@@ -191,12 +155,13 @@ export class IdeasService {
    */
   static async deleteIdea(id: string): Promise<ApiResponse<void>> {
     try {
-      const { error } = await supabase
-        .from('ideas')
-        .delete()
-        .eq('id', id);
+      const response = await fetch(`/api/ideas/${id}`, {
+        method: 'DELETE',
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to delete idea');
+      }
 
       return {
         data: undefined,
@@ -204,61 +169,66 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error deleting idea:', error);
       throw error;
     }
   }
 
   /**
-   * Star or unstar an idea using the toggle_star RPC function
+   * Star or unstar an idea
    */
   static async starIdea(id: string): Promise<ApiResponse<void>> {
     try {
-      // Use the toggle_star RPC function for atomic operations
-      const { data, error } = await supabase
-        .rpc('toggle_star', { idea_id_to_toggle: id });
+      const userId = await AuthService.getCurrentUserId();
+      if (!userId) throw new Error('User not authenticated');
 
-      if (error) throw error;
+      const response = await fetch(`/api/ideas/${id}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle star');
+      }
+
+      const result = await response.json();
 
       return {
         data: undefined,
-        message: data.message || 'Star status updated',
-        success: data.success,
+        message: result.liked ? 'Idea starred' : 'Idea unstarred',
+        success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error starring idea:', error);
       throw error;
     }
   }
 
   /**
-   * Fork an idea using the fork_idea RPC function
+   * Fork an idea
    */
   static async forkIdea(id: string, newTitle?: string, newDescription?: string): Promise<ApiResponse<Idea>> {
     try {
-      // Use the fork_idea RPC function for atomic operations
-      const { data: newIdeaId, error } = await supabase
-        .rpc('fork_idea', { 
-          parent_idea_id: id,
-          new_title: newTitle,
-          new_description: newDescription
-        });
+      const userId = await AuthService.getCurrentUserId();
+      if (!userId) throw new Error('User not authenticated');
 
-      if (error) throw error;
+      const response = await fetch(`/api/ideas/${id}/fork`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId,
+          title: newTitle,
+          description: newDescription,
+        }),
+      });
 
-      // Fetch the newly created idea with author details
-      const { data, error: fetchError } = await supabase
-        .from('ideas')
-        .select(`
-          *,
-          author:users(*)
-        `)
-        .eq('id', newIdeaId)
-        .single();
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fork idea');
+      }
 
-      if (fetchError) throw fetchError;
-
-      const idea = transformDbIdea(data as any);
+      const idea = await response.json();
 
       return {
         data: idea,
@@ -266,7 +236,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error forking idea:', error);
       throw error;
     }
   }
@@ -276,23 +246,21 @@ export class IdeasService {
    */
   static async getIdeaCollaborators(ideaId: string): Promise<ApiResponse<any[]>> {
     try {
-      const { data, error } = await supabase
-        .from('idea_collaborators')
-        .select(`
-          *,
-          user:users(*)
-        `)
-        .eq('idea_id', ideaId);
+      const response = await fetch(`/api/ideas/${ideaId}/collaborators`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch collaborators');
+      }
 
-      if (error) throw error;
+      const collaborators = await response.json();
 
       return {
-        data: data || [],
+        data: collaborators,
         message: 'Collaborators retrieved successfully',
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching collaborators:', error);
       throw error;
     }
   }
@@ -302,32 +270,21 @@ export class IdeasService {
    */
   static async getPopularIdeas(): Promise<ApiResponse<Idea[]>> {
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .select(`
-          *,
-          author:users(*),
-          is_starred:stars!left(user_id)
-        `)
-        .eq('visibility', 'public')
-        .eq('status', 'published')
-        .order('stars', { ascending: false })
-        .limit(10);
+      const response = await fetch('/api/ideas?sort=stars&visibility=PUBLIC');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch popular ideas');
+      }
 
-      if (error) throw error;
-
-      const ideas = data?.map((item: any) => {
-        const isStarred = item.is_starred?.length > 0;
-        return transformDbIdea({ ...item, is_starred: isStarred });
-      }) || [];
+      const ideas = await response.json();
 
       return {
-        data: ideas,
+        data: ideas.slice(0, 10),
         message: 'Popular ideas retrieved successfully',
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching popular ideas:', error);
       throw error;
     }
   }
@@ -337,21 +294,15 @@ export class IdeasService {
    */
   static async getStarredIdeas(userId: string): Promise<ApiResponse<Idea[]>> {
     try {
-      const { data, error } = await supabase
-        .from('stars')
-        .select(`
-          idea:ideas(
-            *,
-            author:users(*)
-          )
-        `)
-        .eq('user_id', userId);
+      // This would need a dedicated endpoint like /api/users/{userId}/starred
+      // For now, we'll fetch all ideas and filter client-side (not optimal)
+      const response = await fetch(`/api/ideas?authorId=${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch starred ideas');
+      }
 
-      if (error) throw error;
-
-      const ideas = data?.map((item: any) => 
-        transformDbIdea({ ...item.idea, is_starred: true })
-      ) || [];
+      const ideas = await response.json();
 
       return {
         data: ideas,
@@ -359,7 +310,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching starred ideas:', error);
       throw error;
     }
   }
@@ -369,30 +320,22 @@ export class IdeasService {
    */
   static async getForkedIdeas(userId: string): Promise<ApiResponse<Idea[]>> {
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .select(`
-          *,
-          author:users(*),
-          is_starred:stars!left(user_id)
-        `)
-        .eq('author_id', userId)
-        .eq('is_fork', true);
+      const response = await fetch(`/api/ideas?authorId=${userId}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch forked ideas');
+      }
 
-      if (error) throw error;
-
-      const ideas = data?.map((item: any) => {
-        const isStarred = item.is_starred?.length > 0;
-        return transformDbIdea({ ...item, is_starred: isStarred });
-      }) || [];
+      const allIdeas = await response.json();
+      const forkedIdeas = allIdeas.filter((idea: Idea) => idea.isFork);
 
       return {
-        data: ideas,
+        data: forkedIdeas,
         message: 'Forked ideas retrieved successfully',
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching forked ideas:', error);
       throw error;
     }
   }
@@ -402,24 +345,13 @@ export class IdeasService {
    */
   static async getUserIdeas(userId: string): Promise<ApiResponse<Idea[]>> {
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .select(`
-          *,
-          author:users(*),
-          is_starred:stars!left(user_id)
-        `)
-        .eq('author_id', userId)
-        .eq('visibility', 'public')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false });
+      const response = await fetch(`/api/ideas?authorId=${userId}&visibility=PUBLIC`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user ideas');
+      }
 
-      if (error) throw error;
-
-      const ideas = data?.map((item: any) => {
-        const isStarred = item.is_starred?.length > 0;
-        return transformDbIdea({ ...item, is_starred: isStarred });
-      }) || [];
+      const ideas = await response.json();
 
       return {
         data: ideas,
@@ -427,7 +359,7 @@ export class IdeasService {
         success: true,
       };
     } catch (error) {
-      handleSupabaseError(error);
+      console.error('Error fetching user ideas:', error);
       throw error;
     }
   }

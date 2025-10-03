@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { 
   FileText, 
   ArrowLeft,

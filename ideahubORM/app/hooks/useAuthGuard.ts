@@ -1,5 +1,7 @@
+'use client';
+
 import { useAuth } from '@/app/contexts/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 interface UseAuthGuardOptions {
   redirectTo?: string;
@@ -9,13 +11,15 @@ interface UseAuthGuardOptions {
 export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
   const { redirectTo = '/login', requireAuth = true } = options;
   const { isAuthenticated, isLoading, user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const requireAuthentication = () => {
     if (!isLoading && !isAuthenticated && requireAuth) {
-      const currentPath = location.pathname + location.search;
-      navigate(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`, { replace: true });
+      const search = searchParams?.toString() || '';
+      const currentPath = pathname + (search ? `?${search}` : '');
+      router.push(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
       return false;
     }
     return isAuthenticated || !requireAuth;

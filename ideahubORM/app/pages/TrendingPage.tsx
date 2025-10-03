@@ -273,3 +273,6 @@ export const PopularPage: React.FC = () => {
     </Layout>
   );
 };
+
+// Export as TrendingPage for compatibility
+export const TrendingPage = PopularPage;

@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'next/link';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 interface ProtectedRouteProps {
@@ -12,7 +14,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo = '/login' 
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 
   useEffect(() => {
@@ -23,6 +27,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    // Redirect to login if not authenticated after checking
+    if (hasCheckedAuth && !isLoading && (!isAuthenticated || !user)) {
+      console.log('ProtectedRoute: User not authenticated, redirecting to login');
+      const search = searchParams?.toString() || '';
+      const currentPath = pathname + (search ? `?${search}` : '');
+      router.push(`${redirectTo}?redirect=${encodeURIComponent(currentPath)}`);
+    }
+  }, [hasCheckedAuth, isLoading, isAuthenticated, user, router, pathname, searchParams, redirectTo]);
 
   // Show loading while checking authentication or during initial auth check
   if (isLoading || !hasCheckedAuth) {
@@ -38,15 +52,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Redirect to login if not authenticated, preserving the intended destination
+  // Don't render children if not authenticated
   if (!isAuthenticated || !user) {
-    console.log('ProtectedRoute: User not authenticated, redirecting to login');
-    return (
-      <Navigate 
-        to={`${redirectTo}?redirect=${encodeURIComponent(location.pathname + location.search)}`} 
-        replace 
-      />
-    );
+    return null;
   }
 
   console.log('ProtectedRoute: User authenticated, allowing access to protected route');

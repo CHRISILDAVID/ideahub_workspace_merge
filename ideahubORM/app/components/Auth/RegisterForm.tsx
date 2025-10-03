@@ -1,10 +1,14 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'next/link';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 export const RegisterForm: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     fullName: '',
     username: '',
@@ -17,14 +21,13 @@ export const RegisterForm: React.FC = () => {
   const [error, setError] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const { register, isLoading } = useAuth();
-  const router = useRouter();
 
   // Check for confirmation success
   React.useEffect(() => {
-    if (searchParams.get('confirmed') === 'true') {
+    if (searchParams?.get('confirmed') === 'true') {
       router.push('/?welcome=true');
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, router]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
@@ -64,7 +67,7 @@ export const RegisterForm: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
+            <Link href="/" className="flex items-center justify-center space-x-2 mb-8">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold">IH</span>
               </div>
@@ -90,7 +93,7 @@ export const RegisterForm: React.FC = () => {
               
               <div className="space-y-3">
                 <Link
-                  to="/login"
+                  href="/login"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center justify-center"
                 >
                   Go to Sign In
@@ -107,7 +110,7 @@ export const RegisterForm: React.FC = () => {
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
                 Already have an account?{' '}
                 <Link
-                  to="/login"
+                  href="/login"
                   className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
                 >
                   Sign in here
@@ -123,7 +126,7 @@ export const RegisterForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link to="/" className="flex items-center justify-center space-x-2">
+          <Link href="/" className="flex items-center justify-center space-x-2">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">IH</span>
             </div>
@@ -135,7 +138,7 @@ export const RegisterForm: React.FC = () => {
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link
-              to="/login"
+              href="/login"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
               sign in to your existing account
@@ -282,11 +285,11 @@ export const RegisterForm: React.FC = () => {
 
           <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
             By creating an account, you agree to our{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
+            <Link href="/terms" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
+            <Link href="/privacy" className="text-blue-600 hover:text-blue-500 dark:text-blue-400">
               Privacy Policy
             </Link>
           </div>

@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { IdeasService } from '@/app/services/api';
+import { IdeasService } from '@/app/services/api/ideas';
 import { Idea } from '@/app/types';
 
 interface ForkButtonProps {

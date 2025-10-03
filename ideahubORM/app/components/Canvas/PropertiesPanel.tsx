@@ -17,7 +17,7 @@ import {
 
 interface CanvasObject {
   id: string;
-  type: 'rectangle' | 'circle' | 'text' | 'line' | 'diamond' | 'polygon' | 'connector' | 'arrow';
+  type: 'rectangle' | 'circle' | 'text' | 'line' | 'diamond' | 'polygon' | 'connector' | 'arrow' | 'frame';
   x: number;
   y: number;
   width?: number;

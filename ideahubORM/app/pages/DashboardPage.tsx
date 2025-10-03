@@ -22,7 +22,13 @@ export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const [userIdeas, setUserIdeas] = useState<Idea[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityType[]>([]);
-  const [dashboardStats, setDashboardStats] = useState({
+  const [dashboardStats, setDashboardStats] = useState<{
+    totalIdeas: number;
+    totalStars: number;
+    totalForks: number;
+    totalViews: number;
+    recentActivity: any[];
+  }>({
     totalIdeas: 0,
     totalStars: 0,
     totalForks: 0,

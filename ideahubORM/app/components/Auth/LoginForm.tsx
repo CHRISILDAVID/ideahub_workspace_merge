@@ -1,19 +1,22 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'next/link';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/app/contexts/AuthContext';
 
 export const LoginForm: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, isLoading } = useAuth();
-  const router = useRouter();
 
   React.useEffect(() => {
-    const errorParam = searchParams.get('error');
+    const errorParam = searchParams?.get('error');
     if (errorParam === 'confirmation_failed') {
       setError('Email confirmation failed. Please try again or contact support.');
     } else if (errorParam === 'unexpected') {
@@ -29,8 +32,8 @@ export const LoginForm: React.FC = () => {
       await login(email, password);
       
       // Redirect to intended destination or home page
-      const redirectTo = searchParams.get('redirect') || '/';
-      navigate(redirectTo, { replace: true });
+      const redirectTo = searchParams?.get('redirect') || '/';
+      router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid email or password');
     }
@@ -40,7 +43,7 @@ export const LoginForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <Link to="/" className="flex items-center justify-center space-x-2">
+          <Link href="/" className="flex items-center justify-center space-x-2">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">IH</span>
             </div>
@@ -52,7 +55,7 @@ export const LoginForm: React.FC = () => {
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or{' '}
             <Link
-              to="/register"
+              href="/register"
               className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
               create a new account
@@ -131,7 +134,7 @@ export const LoginForm: React.FC = () => {
 
             <div className="text-sm">
               <Link
-                to="/forgot-password"
+                href="/forgot-password"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
               >
                 Forgot your password?
@@ -157,7 +160,7 @@ export const LoginForm: React.FC = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Need an account?{' '}
               <Link
-                to="/register"
+                href="/register"
                 className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
               >
                 Sign up here

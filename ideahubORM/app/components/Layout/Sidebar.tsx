@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { Link, useLocation } from 'next/link';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
   Home, 
   Compass, 
@@ -14,10 +17,10 @@ import { useAuth } from '@/app/contexts/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const location = useLocation();
+  const pathname = usePathname();
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return pathname === path;
   };
 
   const navItems = [
@@ -44,7 +47,7 @@ export const Sidebar: React.FC = () => {
             return (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                   isActive(item.path)
                     ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
@@ -71,7 +74,7 @@ export const Sidebar: React.FC = () => {
                 return (
                   <Link
                     key={item.path}
-                    to={item.path}
+                    href={item.path}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                       isActive(item.path)
                         ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
@@ -116,13 +119,13 @@ export const Sidebar: React.FC = () => {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
           <div className="px-3 space-y-2 text-xs text-gray-500 dark:text-gray-400">
-            <Link to="/about" className="block hover:text-blue-600 dark:hover:text-blue-400">
+            <Link href="/about" className="block hover:text-blue-600 dark:hover:text-blue-400">
               About IdeaHub
             </Link>
-            <Link to="/privacy" className="block hover:text-blue-600 dark:hover:text-blue-400">
+            <Link href="/privacy" className="block hover:text-blue-600 dark:hover:text-blue-400">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="block hover:text-blue-600 dark:hover:text-blue-400">
+            <Link href="/terms" className="block hover:text-blue-600 dark:hover:text-blue-400">
               Terms of Service
             </Link>
             <div className="pt-2 text-xs">

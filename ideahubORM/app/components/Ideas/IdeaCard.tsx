@@ -33,7 +33,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
-            <Link to={`/profile/${idea.author.username}`}>
+            <Link href={`/profile/${idea.author.username}`}>
               <img
                 src={idea.author.avatar || `https://ui-avatars.com/api/?name=${idea.author.fullName}&background=random`}
                 alt={idea.author.fullName}
@@ -42,7 +42,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
             </Link>
             <div>
               <Link 
-                to={`/profile/${idea.author.username}`}
+                href={`/profile/${idea.author.username}`}
                 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
               >
                 {idea.author.username}
@@ -74,7 +74,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
 
         {/* Title and Description */}
         <div className="mb-4">
-          <Link to={`/ideas/${idea.id}`}>
+          <Link href={`/ideas/${idea.id}`}>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 mb-2">
               {idea.title}
             </h3>
@@ -89,7 +89,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
           {idea.tags.slice(0, 3).map((tag) => (
             <Link
               key={tag}
-              to={`/search?tag=${encodeURIComponent(tag)}`}
+              href={`/search?tag=${encodeURIComponent(tag)}`}
               className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/30 transition-colors"
             >
               {tag}
@@ -134,7 +134,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
             />
             
             <Link
-              to={`/ideas/${idea.id}#comments`}
+              href={`/ideas/${idea.id}#comments`}
               className="flex items-center space-x-1 px-3 py-1 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
@@ -143,7 +143,7 @@ export const IdeaCard: React.FC<IdeaCardProps> = ({ idea, onUpdate }) => {
           </div>
 
           <Link
-            to={`/ideas/${idea.id}`}
+            href={`/ideas/${idea.id}`}
             className="flex items-center space-x-1 px-3 py-1 rounded-lg text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
           >
             <Eye className="w-4 h-4" />

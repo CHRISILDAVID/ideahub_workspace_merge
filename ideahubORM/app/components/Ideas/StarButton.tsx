@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { IdeasService } from '@/app/services/api';
+import { IdeasService } from '@/app/services/api/ideas';
 
 interface StarButtonProps {
   ideaId: string;
